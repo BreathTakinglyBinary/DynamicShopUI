@@ -1,11 +1,10 @@
 <?php
 
-namespace RevivalPMMP\DynamicShopUI\commands;
+namespace BreathTakinglyBinary\DynamicShopUI\commands;
 
-
+use BreathTakinglyBinary\DynamicShopUI\DynamicShopUI;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use RevivalPMMP\DynamicShopUI\DynamicShopUI;
 
 class DSUSellCommand extends DSUBaseCommand{
 

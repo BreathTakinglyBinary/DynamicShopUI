@@ -1,21 +1,19 @@
 <?php
 
-namespace RevivalPMMP\DynamicShopUI;
+namespace BreathTakinglyBinary\DynamicShopUI;
 
+use BreathTakinglyBinary\DynamicShopUI\commands\DSUMainCommand;
+use BreathTakinglyBinary\DynamicShopUI\commands\DSUSellCommand;
+use BreathTakinglyBinary\DynamicShopUI\commands\DSUShopCommand;
+use BreathTakinglyBinary\DynamicShopUI\data\DSUConfig;
+use BreathTakinglyBinary\DynamicShopUI\ui\DSUManagementForms;
+use BreathTakinglyBinary\DynamicShopUI\ui\DSUShopForms;
+use BreathTakinglyBinary\DynamicShopUI\utils\SellTools;
 use jojoe77777\FormAPI\FormAPI;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
 use pocketmine\Player;
-use RevivalPMMP\DynamicShopUI\commands\DSUShopCommand;
-use RevivalPMMP\DynamicShopUI\commands\DSUMainCommand;
-use RevivalPMMP\DynamicShopUI\commands\DSUSellCommand;
-use RevivalPMMP\DynamicShopUI\data\DSUConfig;
-use RevivalPMMP\DynamicShopUI\elements\DSUItem;
-use RevivalPMMP\DynamicShopUI\ui\DSUManagementForms;
-use RevivalPMMP\DynamicShopUI\ui\DSUShopForms;
-use RevivalPMMP\DynamicShopUI\utils\DynamicShopTransaction;
-use RevivalPMMP\DynamicShopUI\utils\SellTools;
 
 
 class DynamicShopUI extends PluginBase {

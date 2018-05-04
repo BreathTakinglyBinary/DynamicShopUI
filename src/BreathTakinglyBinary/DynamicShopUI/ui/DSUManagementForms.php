@@ -1,17 +1,15 @@
 <?php
 
-namespace RevivalPMMP\DynamicShopUI\ui;
+namespace BreathTakinglyBinary\DynamicShopUI\ui;
 
 
+use BreathTakinglyBinary\DynamicShopUI\data\DataKeys;
+use BreathTakinglyBinary\DynamicShopUI\elements\DSUCategory;
+use BreathTakinglyBinary\DynamicShopUI\elements\DSUItem;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
-use RevivalPMMP\DynamicShopUI\data\DataKeys;
-use RevivalPMMP\DynamicShopUI\data\DSUConfig;
-use RevivalPMMP\DynamicShopUI\DynamicShopUI;
-use RevivalPMMP\DynamicShopUI\elements\DSUCategory;
-use RevivalPMMP\DynamicShopUI\elements\DSUItem;
 
 class DSUManagementForms extends DSUForms{
 

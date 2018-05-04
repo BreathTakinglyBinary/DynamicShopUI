@@ -1,13 +1,13 @@
 <?php
 
-namespace RevivalPMMP\DynamicShopUI\ui;
+namespace BreathTakinglyBinary\DynamicShopUI\ui;
 
+use BreathTakinglyBinary\DynamicShopUI\data\DataKeys;
+use BreathTakinglyBinary\DynamicShopUI\elements\DSUCategory;
+use BreathTakinglyBinary\DynamicShopUI\elements\DSUElement;
+use BreathTakinglyBinary\DynamicShopUI\elements\DSUItem;
+use BreathTakinglyBinary\DynamicShopUI\utils\DynamicShopTransaction;
 use pocketmine\Player;
-use RevivalPMMP\DynamicShopUI\data\DataKeys;
-use RevivalPMMP\DynamicShopUI\elements\DSUCategory;
-use RevivalPMMP\DynamicShopUI\elements\DSUElement;
-use RevivalPMMP\DynamicShopUI\elements\DSUItem;
-use RevivalPMMP\DynamicShopUI\utils\DynamicShopTransaction;
 
 class DSUShopForms extends DSUForms {
 

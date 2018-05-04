@@ -1,16 +1,15 @@
 <?php
 
-namespace RevivalPMMP\DynamicShopUI\utils;
+namespace BreathTakinglyBinary\DynamicShopUI\utils;
 
 
+use BreathTakinglyBinary\DynamicShopUI\DynamicShopUI;
+use BreathTakinglyBinary\DynamicShopUI\elements\DSUItem;
 use jojoe77777\FormAPI\FormAPI;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
-use RevivalPMMP\DynamicShopUI\DynamicShopUI;
-use RevivalPMMP\DynamicShopUI\elements\DSUItem;
 
 class DynamicShopTransaction{
 

@@ -1,6 +1,6 @@
 ---
 name: DynamicShopUI
-main: RevivalPMMP\DynamicShopUI\DynamicShopUI
+main: BreathTakinglyBinary\DynamicShopUI\DynamicShopUI
 api:
 - 3.0.0-ALPHA11
 - 3.0.0-ALPHA12

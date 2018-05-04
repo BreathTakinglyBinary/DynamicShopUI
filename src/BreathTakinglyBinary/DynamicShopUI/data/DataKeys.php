@@ -1,5 +1,5 @@
 <?php
-namespace RevivalPMMP\DynamicShopUI\data;
+namespace BreathTakinglyBinary\DynamicShopUI\data;
 
 Interface DataKeys{
 

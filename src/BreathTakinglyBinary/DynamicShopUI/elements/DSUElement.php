@@ -1,9 +1,9 @@
 <?php
 
-namespace RevivalPMMP\DynamicShopUI\elements;
+namespace BreathTakinglyBinary\DynamicShopUI\elements;
 
 
-use RevivalPMMP\DynamicShopUI\data\DSUConfig;
+use BreathTakinglyBinary\DynamicShopUI\data\DSUConfig;
 
 abstract class DSUElement{
 

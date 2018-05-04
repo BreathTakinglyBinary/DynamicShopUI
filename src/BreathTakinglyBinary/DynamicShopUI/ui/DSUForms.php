@@ -1,10 +1,10 @@
 <?php
 
-namespace RevivalPMMP\DynamicShopUI\ui;
+namespace BreathTakinglyBinary\DynamicShopUI\ui;
 
+use BreathTakinglyBinary\DynamicShopUI\data\DSUConfig;
+use BreathTakinglyBinary\DynamicShopUI\DynamicShopUI;
 use jojoe77777\FormAPI\FormAPI;
-use RevivalPMMP\DynamicShopUI\data\DSUConfig;
-use RevivalPMMP\DynamicShopUI\DynamicShopUI;
 
 abstract class DSUForms{
 

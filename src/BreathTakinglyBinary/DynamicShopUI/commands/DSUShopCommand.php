@@ -1,16 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: aaron
- * Date: 3/15/2018
- * Time: 4:17 AM
- */
 
-namespace RevivalPMMP\DynamicShopUI\commands;
+namespace BreathTakinglyBinary\DynamicShopUI\commands;
 
+use BreathTakinglyBinary\DynamicShopUI\DynamicShopUI;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use RevivalPMMP\DynamicShopUI\DynamicShopUI;
 
 class DSUShopCommand extends DSUBaseCommand{
 

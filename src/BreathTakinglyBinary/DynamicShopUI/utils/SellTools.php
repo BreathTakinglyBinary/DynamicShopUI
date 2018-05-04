@@ -1,14 +1,14 @@
 <?php
 
 
-namespace RevivalPMMP\DynamicShopUI\utils;
+namespace BreathTakinglyBinary\DynamicShopUI\utils;
 
 
+use BreathTakinglyBinary\DynamicShopUI\data\DSUConfig;
+use BreathTakinglyBinary\DynamicShopUI\DynamicShopUI;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\item\Item;
 use pocketmine\Player;
-use RevivalPMMP\DynamicShopUI\data\DSUConfig;
-use RevivalPMMP\DynamicShopUI\DynamicShopUI;
 
 class SellTools{
 	/**

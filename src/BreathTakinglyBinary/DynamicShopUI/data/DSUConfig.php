@@ -1,12 +1,10 @@
 <?php
 
-namespace RevivalPMMP\DynamicShopUI\data;
+namespace BreathTakinglyBinary\DynamicShopUI\data;
 
-
-use RevivalPMMP\DynamicShopUI\DynamicShopUI;
-use RevivalPMMP\DynamicShopUI\elements\DSUCategory;
-use RevivalPMMP\DynamicShopUI\elements\DSUItem;
-use revivalpmmp\pureentities\data\Data;
+use BreathTakinglyBinary\DynamicShopUI\DynamicShopUI;
+use BreathTakinglyBinary\DynamicShopUI\elements\DSUCategory;
+use BreathTakinglyBinary\DynamicShopUI\elements\DSUItem;
 
 class DSUConfig{
 
@@ -202,6 +200,7 @@ class DSUConfig{
 		if(isset($this->items[$itemName])){
 			return $this->items[$itemName];
 		}
+		return null;
 	}
 
 	public function isShopItem($itemName): bool{

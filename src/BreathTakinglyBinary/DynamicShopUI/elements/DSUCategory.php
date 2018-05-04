@@ -1,12 +1,12 @@
 <?php
 
 
-namespace RevivalPMMP\DynamicShopUI\elements;
+namespace BreathTakinglyBinary\DynamicShopUI\elements;
 
 
+use BreathTakinglyBinary\DynamicShopUI\data\DataKeys;
+use BreathTakinglyBinary\DynamicShopUI\data\DSUConfig;
 use pocketmine\Server;
-use RevivalPMMP\DynamicShopUI\data\DataKeys;
-use RevivalPMMP\DynamicShopUI\data\DSUConfig;
 
 class DSUCategory extends DSUElement{
 

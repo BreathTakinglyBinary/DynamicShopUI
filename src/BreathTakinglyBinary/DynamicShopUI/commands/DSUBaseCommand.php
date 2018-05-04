@@ -2,14 +2,15 @@
 
 declare(strict_types = 1);
 
-namespace RevivalPMMP\DynamicShopUI\commands;
+namespace BreathTakinglyBinary\DynamicShopUI\commands;
 
+use BreathTakinglyBinary\DynamicShopUI\DynamicShopUI;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat as TF;
-use RevivalPMMP\DynamicShopUI\DynamicShopUI;
+
 
 
 abstract class DSUBaseCommand extends Command implements PluginIdentifiableCommand {
