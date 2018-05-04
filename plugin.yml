@@ -1,0 +1,41 @@
+---
+name: DynamicShopUI
+main: RevivalPMMP\DynamicShopUI\DynamicShopUI
+api:
+- 3.0.0-ALPHA11
+- 3.0.0-ALPHA12
+version: 0.1.2
+depend: [FormAPI, EconomyAPI]
+author: FiberglassCivic(95CivicSi)
+
+"permissions": {
+        "dsu": {
+            "default": false,
+            "description": "Allows access to all DynamicShopUI features.",
+            "children": {
+                "dsu.configuration": {
+                    "default": "op",
+                    "description": "Allows modifying the configuration in-game."
+                },
+                "dsu.command": {
+                    "default": false,
+                    "description": "Allows access to all DSU command features.",
+                    "children": {
+                        "dsu.command.manage": {
+                            "default": "op",
+                            "description": "Allows user to manage buy/sell options for the shop."
+                        },
+                        "dsu.command.sell": {
+                            "default": true,
+                            "description": "Allows the sell of items in user's inventory, to the shop."
+                        },
+                        "dsu.command.shop": {
+                            "default": true,
+                            "description": "Allows access to the Shop UI so players can buy items."
+                        }
+                    }
+                }
+            }
+        }
+    }
+...
