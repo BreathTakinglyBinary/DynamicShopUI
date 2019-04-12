@@ -18,6 +18,9 @@ use pocketmine\Player;
 
 class DynamicShopUI extends PluginBase {
 
+    /** @var  DynamicShopUI*/
+    private static $instance;
+
     /**
      * @var $cfg DSUConfig
      */
@@ -48,12 +51,8 @@ class DynamicShopUI extends PluginBase {
 	 */
 	private $sellTools;
 
-    public function onLoad(){
-
-	}
-
 	public function onEnable(){
-		// Double Checking that FormAPI is available.
+		self::$instance = $this;
         if(($this->formAPI = $this->getServer()->getPluginManager()->getPlugin("FormAPI")) === null
 		    or $this->formAPI->isDisabled()){
         	$this->getLogger()->warning("FormAPI is not available.  Disabling DynamicShopUI");
@@ -75,6 +74,10 @@ class DynamicShopUI extends PluginBase {
 
 		$this->registerCommands();
         $this->getLogger()->info(TextFormat::GREEN . "enabled.");
+    }
+
+    public static function getInstance(): DynamicShopUI{
+	    return self::$instance;
     }
 
     private function registerCommands() {
