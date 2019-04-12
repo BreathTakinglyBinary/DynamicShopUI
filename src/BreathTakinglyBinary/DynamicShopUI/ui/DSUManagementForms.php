@@ -6,6 +6,8 @@ namespace BreathTakinglyBinary\DynamicShopUI\ui;
 use BreathTakinglyBinary\DynamicShopUI\data\DataKeys;
 use BreathTakinglyBinary\DynamicShopUI\elements\DSUCategory;
 use BreathTakinglyBinary\DynamicShopUI\elements\DSUItem;
+use jojoe77777\FormAPI\CustomForm;
+use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\Player;
@@ -14,49 +16,50 @@ use pocketmine\utils\TextFormat;
 class DSUManagementForms extends DSUForms{
 
 	public function dsuManageMainForm(Player $player){
-		$form = $this->formAPI->createSimpleForm([$this, "handleManageMainForm"]);
+		$form = new SimpleForm([$this, "handleManageMainForm"]);
 		$form->setTitle($this->shopName . " - Manage");
 		$form->addButton("Update Items");
 		$form->addButton("Update Categories");
 		if($player->hasPermission("dsu.configuration")){
 			$form->addButton("Update DynamicShopUI Settings");
 		}
-		$form->sendToPlayer($player);
+		$player->sendForm($form);
 	}
-	public function handleManageMainForm(Player $player, array $data){
-		$result = $data[0];
-		if ($result === null) {
+
+	public function handleManageMainForm(Player $player, $data){
+		if ($data === null) {
 			// Player clicked the close button
 			return;
 		}
 
-		switch($result){
+		switch($data){
 			case 0:
 				$this->updateItemsForm($player);
 				break;
 			case 1:
 				$this->updateCategoriesForm($player);
 				break;
+			case 2:
+				$player->sendMessage("Update Settings Feature is not available yet.");
 		}
 	}
 
 	public function  updateItemsForm(Player $player, string $msg = "") {
-		$form = $this->plugin->getFormAPI()->createSimpleForm([$this,"handleUpdateItemsForm"]);
+		$form = new SimpleForm([$this,"handleUpdateItemsForm"]);
 		$form->setTitle("§f§5Items §f- Choose Action");
 		$form->setContent($msg);
 		$form->addButton("Add Item");
 		$form->addButton("Modify Item");
 		$form->addButton("Delete Item");
 		$form->addButton("Back");
-		$form->sendToPlayer($player);
+		$player->sendForm($form);
 	}
 
-	public function handleUpdateItemsForm(Player $player, array $data){
-		$result = $data[0];
-		if($result === null){
+	public function handleUpdateItemsForm(Player $player, $data){
+		if($data === null){
 			return;
 		}
-		switch($result){
+		switch($data){
 			case 0:
 				$this->addItemForm($player);
 				break;
@@ -82,7 +85,7 @@ class DSUManagementForms extends DSUForms{
 			array_push($categories, $category->getName());
 		}
 		$this->options[$player->getUniqueId()->toString()] = $categories;
-		$form = $this->formAPI->createCustomForm([$this, "handleAddItemForm"]);
+		$form = new CustomForm([$this, "handleAddItemForm"]);
 		$form->setTitle("Item - Add");
 		$form->addInput("Item ID", "236");
 		$form->addInput("Meta", "10");
@@ -91,10 +94,10 @@ class DSUManagementForms extends DSUForms{
 		$form->addInput("Image URL", "http://yoursite.com/imagefile.png");
 		$form->addToggle("Buy this item. (No / Yes)", false);
 		$form->addInput("Buy Price (each)", "10");
-		$form->sendToPlayer($player);
+		$player->sendForm($form);
 	}
 
-	public function handleAddItemForm(Player $player, array $data) {
+	public function handleAddItemForm(Player $player, ?array $data) {
 		$result = $data;
 		if($result[0] === null){
 			return;
@@ -121,17 +124,17 @@ class DSUManagementForms extends DSUForms{
 	}
 
 	public function selectItemToModify(Player $player){
-		$form = $this->formAPI->createCustomForm([$this, "handleSelectItemToModify"]);
+		$form = new CustomForm([$this, "handleSelectItemToModify"]);
 		$form->setTitle("§5§lSelect Item to Modify");
 		$form->addLabel("Input Item Name or Item ID and Meta\n");
 		$form->addInput("Item Name", "Purple Concrete");
 		$form->addLabel("\nor");
 		$form->addInput("\nItemID", "236");
 		$form->addInput("Meta", "10");
-		$form->sendToPlayer($player);
+		$player->sendForm($form);
 	}
 
-	public function handleSelectItemToModify(Player $player, array $data) {
+	public function handleSelectItemToModify(Player $player, ?array $data) {
 		$result = $data;
 		if(!isset($result[1])){
 			return;
@@ -175,17 +178,17 @@ class DSUManagementForms extends DSUForms{
 		$this->options[$player->getUniqueId()->toString()][DataKeys::SHOP_DATA_PARENTS_KEY] = $parents;
 		$this->options[$player->getUniqueId()->toString()][DataKeys::SHOP_DATA_CATEGORIES_KEY] = $categories;
 
-		$form = $this->formAPI->createCustomForm([$this, "handleModifyItemForm"]);
+		$form = new CustomForm([$this, "handleModifyItemForm"]);
 		$form->setTitle("§5§lModify Item - §f$itemName");
 		$form->addInput("Sell Price", $sellPrice);
 		$form->addInput("Buy Price", $buyPrice);
 		$form->addInput("Image URL", $imageURL);
 		$form->addDropdown("Remove Parent", $parents);
 		$form->addDropdown("Add Parent", $categories);
-		$form->sendToPlayer($player);
+		$player->sendForm($form);
 	}
 
-	public function handleModifyItemForm(Player $player, array $data){
+	public function handleModifyItemForm(Player $player, ?array $data){
 		$result = $data;
 		$itemName = $this->options[$player->getUniqueId()->toString()][DataKeys::SHOP_DATA_ITEMS_KEY];
 		$item = $this->plugin->getSettings()->getItem($itemName);
@@ -229,17 +232,17 @@ class DSUManagementForms extends DSUForms{
 	}
 
 	public function selectItemToDelete(Player $player){
-		$form = $this->formAPI->createCustomForm([$this, "handleSelectItemToDelete"]);
+		$form = new CustomForm([$this, "handleSelectItemToDelete"]);
 		$form->setTitle("§5§lSelect Item to Delete");
 		$form->addLabel("Input Item Name or Item ID and Meta\n");
 		$form->addInput("Item Name", "Purple Concrete");
 		$form->addLabel("\nor");
 		$form->addInput("\nItemID", "236");
 		$form->addInput("Meta", "10");
-		$form->sendToPlayer($player);
+		$player->sendForm($form);
 	}
 
-	public function handleSelectItemToDelete(Player $player, array $data){
+	public function handleSelectItemToDelete(Player $player, ?array $data){
 		// Consider Merging this with handleSelectItemToModify
 		$result = $data;
 		if(!isset($result[1])){
@@ -273,21 +276,20 @@ class DSUManagementForms extends DSUForms{
 	}
 
 	public function updateCategoriesForm(Player $player) {
-		$form = $this->plugin->getFormAPI()->createSimpleForm([$this,"handleUpdateCategoriesForm"]);
+		$form = new SimpleForm([$this,"handleUpdateCategoriesForm"]);
 		$form->setTitle("Categories - Choose Action");
 		$form->addButton("Add Category");
 		$form->addButton("Modify Category");
 		$form->addButton("Back");
-		$form->sendToPlayer($player);
+		$player->sendForm($form);
 	}
 
-	public function handleUpdateCategoriesForm(Player $player, array $data){
-		$result = $data[0];
-		if($result === null) {
+	public function handleUpdateCategoriesForm(Player $player, $data){
+		if($data === null) {
 			// Player closed the form.
 			return;
 		}
-		switch($result){
+		switch($data){
 			case 0:
 				$this->addCategoryForm($player);
 				break;
@@ -311,15 +313,15 @@ class DSUManagementForms extends DSUForms{
 			array_push($parentChoices, $category->getName());
 		}
 		$this->options[$player->getUniqueId()->toString()] = $parentChoices;
-		$form = $this->formAPI->createCustomForm([$this, "addCategory"]);
+		$form = new CustomForm([$this, "addCategory"]);
 		$form->setTitle("Add New Category");
 		$form->addInput("Category Name");
 		$form->addDropdown("Parent", $parentChoices);
 		$form->addInput("Image URL");
-		$form->sendToPlayer($player);
+		$player->sendForm($form);
 	}
 
-	public function addCategory(Player $player, array $data) {
+	public function addCategory(Player $player, ?array $data) {
 		$result = $data;
 		if(!isset($result[1])){
 			return;
@@ -339,7 +341,7 @@ class DSUManagementForms extends DSUForms{
 	}
 
 	public function modifyCategoryForm(Player $player, string $msg = null) {
-		$form = $this->formAPI->createSimpleForm([$this,"handleModifyCategoryForm"]);
+		$form = new SimpleForm([$this,"handleModifyCategoryForm"]);
 		$form->setTitle("Modify Category");
 		if($msg !== null){
 			$form->setContent(TextFormat::RED . TextFormat::BOLD . $msg);
@@ -349,16 +351,15 @@ class DSUManagementForms extends DSUForms{
 		$form->addButton("Update Image");
 		$form->addButton("Delete Category");
 		$form->addButton("Back");
-		$form->sendToPlayer($player);
+		$player->sendForm($form);
 	}
 
-	public function handleModifyCategoryForm(Player $player, array $data) {
-		$result = $data[0];
-		if($result === null){
+	public function handleModifyCategoryForm(Player $player, $data) {
+		if($data === null){
 			// Player closed the form
 			return;
 		}
-		switch($result){
+		switch($data){
 			case 0:
 				$this->addCategoryParentForm($player);
 				break;
@@ -383,15 +384,15 @@ class DSUManagementForms extends DSUForms{
 			array_push($availableCategories, $category);
 		}
 		$this->options[$player->getUniqueId()->toString()] = $availableCategories;
-		$form = $this->formAPI->createCustomForm([$this, "handleAddCategoryParentForm"]);
+		$form = new CustomForm([$this, "handleAddCategoryParentForm"]);
 		$form->setTitle("Category - Add Parent");
 		$form->addDropdown("Category to Update", $availableCategories);
 		$form->addDropdown("Parent Category to Add", $availableCategories);
-		$form->sendToPlayer($player);
+		$player->sendForm($form);
 
 	}
 
-	public function handleAddCategoryParentForm(Player $player, array $data) {
+	public function handleAddCategoryParentForm(Player $player, ?array $data) {
 		$result = $data;
 		if(!isset($result[1])){
 			return;
@@ -408,7 +409,7 @@ class DSUManagementForms extends DSUForms{
 	}
 
 	public function categorySelectionForm(Player $player, bool $remove = false){
-		$form = $this->formAPI->createCustomForm([$this, "handleCategorySelectionForm"]);
+		$form = new CustomForm([$this, "handleCategorySelectionForm"]);
 
 		$categories = [];
 
@@ -422,12 +423,11 @@ class DSUManagementForms extends DSUForms{
 		$form->setTitle("Category Selection");
 		$form->addLabel("\n"); // Adding some blank lines for visual effect.
 		$form->addDropdown("Choose Category", $categories);
-		$form->sendToPlayer($player);
+		$player->sendForm($form);
 	}
 
-	public function handleCategorySelectionForm(Player $player, array $data) {
+	public function handleCategorySelectionForm(Player $player, ?array $data) {
 		$result = $data;
-		var_dump($result);
 		if(!isset($result[1])){
 			return;
 		}
@@ -451,7 +451,7 @@ class DSUManagementForms extends DSUForms{
 	public function removeCategoryParentForm(Player $player, string $category){
 		$parents = $this->plugin->getSettings()->getCategory($category)->getAllParents();
 		if($parents !== null or count($parents) < 1){
-			$form = $this->formAPI->createCustomForm([$this, "handleRemoveCategoryParentForm"]);
+			$form = new CustomForm([$this, "handleRemoveCategoryParentForm"]);
 			$options = [];
 			/**
 			 * @var DSUCategory $parent;
@@ -463,13 +463,13 @@ class DSUManagementForms extends DSUForms{
 			$form->addDropdown("\nSelect parent to remove.", $options);
 			array_push($options, $category);
 			$this->options[$player->getUniqueId()->toString()] = $options;
-			$form->sendToPlayer($player);
+			$player->sendForm($form);
 		} else {
 			$this->modifyCategoryForm($player, TextFormat::RED . "$category doesn't have any parents.");
 		}
 	}
 
-	public function handleRemoveCategoryParentForm(Player $player, array $data) {
+	public function handleRemoveCategoryParentForm(Player $player, ?array $data) {
 		$result = $data;
 		if(!isset($result[0]) or $result[0] === null){
 			return;
@@ -486,13 +486,13 @@ class DSUManagementForms extends DSUForms{
 		if($imgURL === null or $imgURL == ""){
 			$imgURL = "http://www.mysite.com/image.png";
 		}
-		$form = $this->plugin->getFormAPI()->createCustomForm([$this, "handleUpdateImageCategoryForm"]);
+		$form = new CustomForm([$this, "handleUpdateImageCategoryForm"]);
 		$form->setTitle("");
 		$form->addInput("New Image URL", $imgURL);
-		$form->sendToPlayer($player);
+		$player->sendForm($form);
 	}
 
-	public function handleUpdateImageCategoryForm(Player $player, array $data){
+	public function handleUpdateImageCategoryForm(Player $player, ?array $data){
 		$result = $data;
 		if($result === null or $result[0] === null){
 			return;
@@ -505,7 +505,7 @@ class DSUManagementForms extends DSUForms{
 	}
 
 	public function deleteCategoryForm(Player $player){
-		$form = $this->formAPI->createCustomForm([$this, "handleDeleteCategoryForm"]);
+		$form = new CustomForm([$this, "handleDeleteCategoryForm"]);
 		$categories = [];
 		/**
 		 * @var DSUCategory $category;
@@ -516,30 +516,29 @@ class DSUManagementForms extends DSUForms{
 		$this->options[$player->getUniqueId()->toString()] = $categories;
 		$form->setTitle(TextFormat::RED . "Delete Category");
 		$form->addDropdown("\n\nSelect Category to Delete", $categories);
-		$form->sendToPlayer($player);
+		$player->sendForm($form);
 	}
 
-	public function handleDeleteCategoryForm(Player $player, array $data){
+	public function handleDeleteCategoryForm(Player $player, ?array $data){
 		$result = $data;
 		if(!isset($result[0]) or $result[0] === null){
 			return;
 		}
 		$selectedCategory = $this->options[$player->getUniqueId()->toString()][$result[0]];
-		$form = $this->formAPI->createSimpleForm([$this, "handleConfirmDeleteCategoryForm"]);
+		$form = new SimpleForm([$this, "handleConfirmDeleteCategoryForm"]);
 		$form->setTitle(TextFormat::RED . "Confirm Delete of $selectedCategory");
 		$form->setContent(TextFormat::BOLD . TextFormat::RED . "Are you sure you want to delete " . TextFormat::BLUE . $selectedCategory . TextFormat::RED . "?");
 		$form->addButton(TextFormat::BOLD . TextFormat::RED . "NO");
 		$form->addButton(TextFormat::BOLD . TextFormat::GREEN . "Yes");
 		$this->options[$player->getUniqueId()->toString()][0] = $selectedCategory;
-		$form->sendToPlayer($player);
+		$player->sendForm($form);
 	}
 
-	public function handleConfirmDeleteCategoryForm(Player $player, array $data){
-		$result = $data;
-		if(!isset($result[0]) or $result[0] === null){
+	public function handleConfirmDeleteCategoryForm(Player $player, $data){
+		if($data === null){
 			return;
 		}
-		if($result[0] === 1){
+		if($data === 1){
 			$selectedCategory = $this->options[$player->getUniqueId()->toString()][0];
 			$this->plugin->getSettings()->removeCategory($selectedCategory);
 			$msg = TextFormat::GREEN . "Deleted " . TextFormat::DARK_PURPLE . $selectedCategory;

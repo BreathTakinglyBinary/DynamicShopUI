@@ -3,10 +3,12 @@
 namespace BreathTakinglyBinary\DynamicShopUI\ui;
 
 use BreathTakinglyBinary\DynamicShopUI\data\DataKeys;
+use BreathTakinglyBinary\DynamicShopUI\DynamicShopUI;
 use BreathTakinglyBinary\DynamicShopUI\elements\DSUCategory;
 use BreathTakinglyBinary\DynamicShopUI\elements\DSUElement;
 use BreathTakinglyBinary\DynamicShopUI\elements\DSUItem;
 use BreathTakinglyBinary\DynamicShopUI\utils\DynamicShopTransaction;
+use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\Player;
 
 class DSUShopForms extends DSUForms {
@@ -26,7 +28,7 @@ class DSUShopForms extends DSUForms {
 		}
 
 		if(!empty($categories)){
-			$form = $this->formAPI->createSimpleForm([$this, "shopFormHandler"]);
+			$form = new SimpleForm([$this, "shopFormHandler"]);
 			$form->setTitle($this->shopName . "§2 - Main");
 			foreach($categories as $menuItem){
 				$name = $menuItem->getName();
@@ -39,29 +41,30 @@ class DSUShopForms extends DSUForms {
 			}
 			$this->options[$player->getUniqueId()->toString()][self::CHOICES_KEY] = $categories;
 			$this->options[$player->getUniqueId()->toString()]["previous"] = "main";
-			$form->sendToPlayer($player);
+			$player->sendForm($form);
 		} else {
-			$player->sendMessage("No main categories found.");
+			$player->sendMessage("The shop is currently closed.");
+			DynamicShopUI::getInstance()->getLogger()->alert(__METHOD__ . " called with no items available in the shop.");
 		}
 	}
 
-	public function shopFormHandler(Player $player, array $data){
-		$result = $data[0];
-
-		if($result === null){
+	public function shopFormHandler(Player $player, $data){
+		if($data === null){
 			return;
 		}
-		if($result >= count($this->options[$player->getUniqueId()->toString()][self::CHOICES_KEY])) {
+		var_dump($data);
+		if($data >= count($this->options[$player->getUniqueId()->toString()][self::CHOICES_KEY])) {
 			// Do the back thing
 			$previous = $this->options[$player->getUniqueId()->toString()]["previous"];
 			if($this->plugin->getSettings()->isCategory($previous)){
 				$selection = $this->plugin->getSettings()->getCategory($previous);
 			} else {
+			    var_dump("Sending Main Form");
 				$this->shopMainForm($player);
 				return;
 			}
 		} else {
-			$selection = $this->options[$player->getUniqueId()->toString()][self::CHOICES_KEY][$result];
+			$selection = $this->options[$player->getUniqueId()->toString()][self::CHOICES_KEY][$data];
 		}
 
 		if($selection instanceof DSUCategory){
@@ -102,7 +105,7 @@ class DSUShopForms extends DSUForms {
 	public function buildMenu(Player $player, $menuItems){
 
 		if(!empty($menuItems)){
-			$form = $this->formAPI->createSimpleForm([$this, "shopFormHandler"]);
+			$form = new SimpleForm([$this, "shopFormHandler"]);
 			$menuName = $this->shopName . "§2 - " . $this->options[$player->getUniqueId()->toString()][DataKeys::SHOP_DATA_CATEGORIES_KEY];
 			$form->setTitle($menuName);
 			$choices = [];
@@ -123,7 +126,7 @@ class DSUShopForms extends DSUForms {
 				}
 			}
 			$form->addButton("Back");
-			$form->sendToPlayer($player);
+			$player->sendForm($form);
 
 		} else {
 			$player->sendMessage("§r Sorry, that menu can't be created right now.");
