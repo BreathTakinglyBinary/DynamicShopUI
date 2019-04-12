@@ -16,111 +16,99 @@ use pocketmine\utils\TextFormat;
 use pocketmine\Player;
 
 
-class DynamicShopUI extends PluginBase {
+class DynamicShopUI extends PluginBase{
 
-    /** @var  DynamicShopUI*/
+    /** @var  DynamicShopUI */
     private static $instance;
 
-    /**
-     * @var $cfg DSUConfig
-     */
+    /** @var DSUConfig */
     private $cfg;
 
-    /**
-     * @var $formAPI FormAPI
-     */
+    /** @var FormAPI */
     private $formAPI;
 
-    /**
-     * @var $moneyAPI EconomyAPI
-     */
+    /** @var EconomyAPI */
     private $moneyAPI;
 
-	/**
-	 * @var DSUManagementForms
-	 */
+    /** @var DSUManagementForms */
     private $dsuManagementForms;
 
-	/**
-	 * @var DSUShopForms
-	 */
-	private $dsuShopForms;
+    /** @var DSUShopForms */
+    private $dsuShopForms;
 
-	/**
-	 * @var SellTools
-	 */
-	private $sellTools;
+    /** @var SellTools */
+    private $sellTools;
 
-	public function onEnable(){
-		self::$instance = $this;
+    public function onEnable(){
+        self::$instance = $this;
         if(($this->formAPI = $this->getServer()->getPluginManager()->getPlugin("FormAPI")) === null
-		    or $this->formAPI->isDisabled()){
-        	$this->getLogger()->warning("FormAPI is not available.  Disabling DynamicShopUI");
-        	$this->setEnabled(false);
-		}
+            or $this->formAPI->isDisabled()){
+            $this->getLogger()->warning("FormAPI is not available.  Disabling DynamicShopUI");
+            $this->setEnabled(false);
+        }
 
-		// Double Checking that EconomyAPI is available.
-		if(($this->moneyAPI = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI")) === null
-			or $this->moneyAPI->isDisabled()){
-			$this->getLogger()->warning("EconomyAPI is not available.  Disabling DynamicShopUI");
-			$this->setEnabled(false);
-		}
+        // Double Checking that EconomyAPI is available.
+        if(($this->moneyAPI = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI")) === null
+            or $this->moneyAPI->isDisabled()){
+            $this->getLogger()->warning("EconomyAPI is not available.  Disabling DynamicShopUI");
+            $this->setEnabled(false);
+        }
 
-		$this->cfg = new DSUConfig($this);
+        $this->cfg = new DSUConfig($this);
 
-		$this->dsuManagementForms = new DSUManagementForms($this);
-		$this->dsuShopForms = new DSUShopForms($this);
-		$this->sellTools = new SellTools($this);
+        $this->dsuManagementForms = new DSUManagementForms($this);
+        $this->dsuShopForms = new DSUShopForms($this);
+        $this->sellTools = new SellTools($this);
 
-		$this->registerCommands();
+        $this->registerCommands();
         $this->getLogger()->info(TextFormat::GREEN . "enabled.");
     }
 
-    public static function getInstance(): DynamicShopUI{
-	    return self::$instance;
+    public static function getInstance() : DynamicShopUI{
+        return self::$instance;
     }
 
-    private function registerCommands() {
-    	$this->getServer()->getCommandMap()->registerAll("dynamicshopui", [
-			new DSUMainCommand($this),
-    		new DSUShopCommand($this),
-			new DSUSellCommand($this),
-    		]);
-	}
+    private function registerCommands(){
+        $this->getServer()->getCommandMap()->registerAll("dynamicshopui", [
+            new DSUMainCommand($this),
+            new DSUShopCommand($this),
+            new DSUSellCommand($this),
+        ]);
+    }
 
-	public function getFormAPI(): FormAPI {
-    	return $this->formAPI;
-	}
+    public function getFormAPI() : FormAPI{
+        return $this->formAPI;
+    }
 
-	public function getEconomyAPI(): EconomyAPI{
-    	return $this->moneyAPI;
-	}
+    public function getEconomyAPI() : EconomyAPI{
+        return $this->moneyAPI;
+    }
 
-	public function getDSUManagementForms() {
-    	return $this->dsuManagementForms;
-	}
+    public function getDSUManagementForms(){
+        return $this->dsuManagementForms;
+    }
 
-	public function getDSUShopForms() {
-    	return $this->dsuShopForms;
-	}
+    public function getDSUShopForms(){
+        return $this->dsuShopForms;
+    }
 
-	public static function sendNoShopMessage(Player $player) {
+    public static function sendNoShopMessage(Player $player){
         $player->sendMessage("Not Available. Check FormAPI.");
     }
 
-	/**
-	 * @return DSUConfig
-	 */
-	public function getSettings() {
-		return $this->cfg;
-	}
+    /**
+     * @return DSUConfig
+     */
+    public function getSettings(){
+        return $this->cfg;
+    }
 
-	public function getSellTools(): SellTools{
-		return $this->sellTools;
-	}
+    public function getSellTools() : SellTools{
+        return $this->sellTools;
+    }
 
-	public function onDisable(){
-		$this->cfg->saveShopData();
-		$this->getLogger()->info(TextFormat::RED . "disabled.");
-	}
+    public function onDisable(){
+        $this->cfg->saveShopData();
+        $this->getLogger()->info(TextFormat::RED . "disabled.");
+    }
 }
