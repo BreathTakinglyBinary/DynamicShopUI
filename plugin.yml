@@ -1,10 +1,8 @@
 ---
 name: DynamicShopUI
 main: BreathTakinglyBinary\DynamicShopUI\DynamicShopUI
-api:
-- 3.0.0-ALPHA11
-- 3.0.0-ALPHA12
-version: 0.1.2
+api: 3.2.0
+version: 0.2.0
 depend: [FormAPI, EconomyAPI]
 author: FiberglassCivic(95CivicSi)
 
