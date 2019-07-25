@@ -1,0 +1,3 @@
+[submodule "src/DynamicForms"]
+	path = src/DynamicForms
+	url = https://github.com/BreathTakinglyBinary/libDynamicForms.git
