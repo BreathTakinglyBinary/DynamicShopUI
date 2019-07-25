@@ -4,8 +4,9 @@
 namespace BreathTakinglyBinary\DynamicShopUI\utils;
 
 
-use BreathTakinglyBinary\DynamicShopUI\data\DSUConfig;
+use BreathTakinglyBinary\DynamicShopUI\DynamicShopManager;
 use BreathTakinglyBinary\DynamicShopUI\DynamicShopUI;
+use BreathTakinglyBinary\DynamicShopUI\elements\DSUItem;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\item\Item;
 use pocketmine\Player;
@@ -23,15 +24,15 @@ class SellTools{
     /** @var DynamicShopUI */
     private $plugin;
 
-    /** @var DSUConfig */
-    private $settings;
+    /** @var DynamicShopManager */
+    private $manager;
 
-    /** @var EconomyAPI  */
+    /** @var EconomyAPI */
     private $eco;
 
     public function __construct(DynamicShopUI $plugin){
         $this->plugin = $plugin;
-        $this->settings = $this->plugin->getSettings();
+        $this->manager = $this->plugin->getDynamicShopManager();
         $this->eco = $plugin->getEconomyAPI();
     }
 
@@ -48,57 +49,34 @@ class SellTools{
     }
 
     public function sellHand(Player $player){
-        $heldItem = $player->getInventory()->getItemInHand();
-        $heldItemIndex = $player->getInventory()->getHeldItemIndex();
-
-        // Clearing the slot before processing the item keeps the player
-        // from switching the item out while we're testing the copy.
-        $player->getInventory()->clear($heldItemIndex);
-        if($heldItem->getId() !== Item::AIR){
-            $heldItemName = $heldItem->getName();
-            if($this->settings->isShopItem($heldItemName)){
-                $shopItem = $this->settings->getItem($heldItemName);
-                if(($price = $shopItem->getBuyPrice()) > 0){
-                    $heldItemQuantity = $heldItem->getCount();
-                    $totalSale = $price * $heldItemQuantity;
-                    $this->eco->addMoney($player, $totalSale);
-                    $this->sendSoldMessage($player, $heldItemName, $heldItemQuantity, $totalSale);
-
-                    return;
-                }
-            }else{
-                $player->getInventory()->setItem($heldItemIndex, $heldItem);
-                $this->sendNoSaleMessage($player, $heldItemName);
-            }
-        }
-
+        $this->sellItem($player, $player->getInventory()->getHeldItemIndex());
     }
 
     public function sellAll(Player $player){
-
         $maxSlots = $player->getInventory()->getDefaultSize();
         for($slot = 0; $slot < $maxSlots; $slot++){
-            $inventoryItem = $player->getInventory()->getItem($slot);
+            $this->sellItem($player, $slot);
+        }
+    }
 
-            // Clearing the slot before processing the item keeps the player
-            // from switching the item out while we're testing the copy.
-            $player->getInventory()->clear($slot);
+    private function sellItem(Player $player, int $index){
+        $playerItem = $player->getInventory()->getItem($index);
 
-            if($inventoryItem->getId() !== Item::AIR){
-                $inventoryItemName = $inventoryItem->getName();
-                if($this->settings->isShopItem($inventoryItemName)){
-                    $shopItem = $this->settings->getItem($inventoryItemName);
-                    if(($price = $shopItem->getBuyPrice()) > 0){
-                        $inventoryItemQuantity = $inventoryItem->getCount();
-                        $totalSale = $price * $inventoryItemQuantity;
-                        $this->eco->addMoney($player, $totalSale);
-                        $this->sendSoldMessage($player, $inventoryItemName, $inventoryItemQuantity, $totalSale);
-                        $sold = true;
-                    }
-                }else{
-                    $player->getInventory()->setItem($slot, $inventoryItem);
+        // Clearing the slot before processing the item keeps the player
+        // from switching the item out while we're testing the copy.
+        $player->getInventory()->clear($index);
+        if($playerItem->getId() !== Item::AIR){
+            if(($shopItem = $this->manager->getItemByItem($playerItem)) instanceof DSUItem){
+                if($shopItem->canBuy() and ($buyPrice = $shopItem->getBuyPrice()) > 0){
+                    $itemQuantity = $playerItem->getCount();
+                    $totalSale = $buyPrice * $itemQuantity;
+                    $this->eco->addMoney($player, $totalSale);
+                    $this->sendSoldMessage($player, $playerItem->getName(), $itemQuantity, $totalSale);
+                    return;
                 }
             }
+            $player->getInventory()->setItem($index, $playerItem);
+            $this->sendNoSaleMessage($player, $playerItem->getName());
         }
     }
 

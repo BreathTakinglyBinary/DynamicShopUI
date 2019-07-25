@@ -3,8 +3,6 @@
 namespace BreathTakinglyBinary\DynamicShopUI\elements;
 
 
-use BreathTakinglyBinary\DynamicShopUI\data\DSUConfig;
-
 class DSUItem extends DSUElement{
 
     /** @var int */
@@ -28,7 +26,6 @@ class DSUItem extends DSUElement{
     /**
      * DSUItem constructor.
      *
-     * @param DSUConfig $settings
      * @param string    $name
      * @param int       $id
      * @param int       $meta
@@ -38,8 +35,8 @@ class DSUItem extends DSUElement{
      * @param bool      $canBuy
      * @param bool      $canSell
      */
-    public function __construct(DSUConfig $settings, string $name, int $id = 0, int $meta = 0, float $buyPrice = 0, float $sellPrice = 0, string $image = "", bool $canBuy = false, bool $canSell = false){
-        parent::__construct($settings, $name, $image);
+    public function __construct(string $name, int $id, int $meta = 0, float $buyPrice = 0, float $sellPrice = 0, string $image = "", bool $canBuy = false, bool $canSell = false){
+        parent::__construct($name, $image);
         $this->id = $id;
         $this->meta = $meta;
         $this->buyPrice = $buyPrice;

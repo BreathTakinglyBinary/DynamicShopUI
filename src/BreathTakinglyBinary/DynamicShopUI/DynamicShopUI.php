@@ -5,15 +5,14 @@ namespace BreathTakinglyBinary\DynamicShopUI;
 use BreathTakinglyBinary\DynamicShopUI\commands\DSUMainCommand;
 use BreathTakinglyBinary\DynamicShopUI\commands\DSUSellCommand;
 use BreathTakinglyBinary\DynamicShopUI\commands\DSUShopCommand;
-use BreathTakinglyBinary\DynamicShopUI\data\DSUConfig;
 use BreathTakinglyBinary\DynamicShopUI\ui\DSUManagementForms;
 use BreathTakinglyBinary\DynamicShopUI\ui\DSUShopForms;
 use BreathTakinglyBinary\DynamicShopUI\utils\SellTools;
 use jojoe77777\FormAPI\FormAPI;
 use onebone\economyapi\EconomyAPI;
+use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
-use pocketmine\Player;
 
 
 class DynamicShopUI extends PluginBase{
@@ -21,8 +20,8 @@ class DynamicShopUI extends PluginBase{
     /** @var  DynamicShopUI */
     private static $instance;
 
-    /** @var DSUConfig */
-    private $cfg;
+    /** @var DynamicShopManager */
+    private $dynamicShopManager;
 
     /** @var FormAPI */
     private $formAPI;
@@ -40,6 +39,7 @@ class DynamicShopUI extends PluginBase{
     private $sellTools;
 
     public function onEnable(){
+        TextFormat::GOLD;
         self::$instance = $this;
         if(($this->formAPI = $this->getServer()->getPluginManager()->getPlugin("FormAPI")) === null
             or $this->formAPI->isDisabled()){
@@ -54,7 +54,9 @@ class DynamicShopUI extends PluginBase{
             $this->setEnabled(false);
         }
 
-        $this->cfg = new DSUConfig($this);
+        $this->dynamicShopManager = new DynamicShopManager($this);
+
+        $this->dynamicShopManager->loadShopData();
 
         $this->dsuManagementForms = new DSUManagementForms($this);
         $this->dsuShopForms = new DSUShopForms($this);
@@ -74,6 +76,13 @@ class DynamicShopUI extends PluginBase{
             new DSUShopCommand($this),
             new DSUSellCommand($this),
         ]);
+    }
+
+    /**
+     * @return DynamicShopManager
+     */
+    public function getDynamicShopManager() : DynamicShopManager{
+        return $this->dynamicShopManager;
     }
 
     public function getFormAPI() : FormAPI{
@@ -96,19 +105,12 @@ class DynamicShopUI extends PluginBase{
         $player->sendMessage("Not Available. Check FormAPI.");
     }
 
-    /**
-     * @return DSUConfig
-     */
-    public function getSettings(){
-        return $this->cfg;
-    }
-
     public function getSellTools() : SellTools{
         return $this->sellTools;
     }
 
     public function onDisable(){
-        $this->cfg->saveShopData();
+        $this->dynamicShopManager->saveShopData();
         $this->getLogger()->info(TextFormat::RED . "disabled.");
     }
 }

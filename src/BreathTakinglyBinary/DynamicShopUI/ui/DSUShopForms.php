@@ -15,22 +15,14 @@ class DSUShopForms extends DSUForms{
 
     const CHOICES_KEY = "choices";
 
-    public function shopMainForm(Player $player){
-        /**
-         * @var DSUCategory[] $categories ;
-         */
-        $categories = [];
-        foreach($this->dsuConfig->getAllCategories() as $category){
-            $parents = $category->getAllParents();
-            if(count($parents) == 0){
-                array_push($categories, $category);
-            }
-        }
-
-        if(!empty($categories)){
+    public function shopMainForm(Player $player, string $msg = ""){
+        if(!empty(($elements = $this->manager->getTopLevelElements()))){
             $form = new SimpleForm([$this, "shopFormHandler"]);
             $form->setTitle($this->shopName . "§2 - Main");
-            foreach($categories as $menuItem){
+            if($msg !== ""){
+                $form->setContent($msg);
+            }
+            foreach($elements as $menuItem){
                 $name = $menuItem->getName();
                 $img = $menuItem->getImage();
                 if($img !== null and $img !== ""){
@@ -39,7 +31,7 @@ class DSUShopForms extends DSUForms{
                     $form->addButton($name);
                 }
             }
-            $this->options[$player->getUniqueId()->toString()][self::CHOICES_KEY] = $categories;
+            $this->options[$player->getUniqueId()->toString()][self::CHOICES_KEY] = $elements;
             $this->options[$player->getUniqueId()->toString()]["previous"] = "main";
             $player->sendForm($form);
         }else{
@@ -52,43 +44,22 @@ class DSUShopForms extends DSUForms{
         if($data === null){
             return;
         }
-        var_dump($data);
         if($data >= count($this->options[$player->getUniqueId()->toString()][self::CHOICES_KEY])){
-            // Do the back thing
-            $previous = $this->options[$player->getUniqueId()->toString()]["previous"];
-            if($this->plugin->getSettings()->isCategory($previous)){
-                $selection = $this->plugin->getSettings()->getCategory($previous);
-            }else{
-                var_dump("Sending Main Form");
-                $this->shopMainForm($player);
-
-                return;
-            }
+            $this->showPreviousMenu($player);
+            return;
         }else{
             $selection = $this->options[$player->getUniqueId()->toString()][self::CHOICES_KEY][$data];
         }
-
         if($selection instanceof DSUCategory){
-            $menuItems = [];
-            $categories = $selection->getCategories();
-            $items = $selection->getItems();
-            if($categories !== null and count($categories) > 0){
-                foreach($categories as $category){
-                    array_push($menuItems, $category);
-                }
-            }
-            if($items !== null and count($items) > 0){
-                foreach($items as $item){
-                    array_push($menuItems, $item);
-                }
-            }
+            $menuItems = $this->getCategoryMenuItems($selection);
             if(!empty($menuItems)){
                 $this->options[$player->getUniqueId()->toString()][self::CHOICES_KEY] = $menuItems;
                 $this->options[$player->getUniqueId()->toString()][DataKeys::SHOP_DATA_CATEGORIES_KEY] = $selection->getName();
                 $this->buildMenu($player, $menuItems);
-
                 return;
             }
+            $this->showPreviousMenu($player, "Category " . $selection->getName() . " is empty.");
+            return;
 
         }elseif($selection instanceof DSUItem){
             $transaction = new DynamicShopTransaction($this->plugin, $player, $selection);
@@ -97,20 +68,45 @@ class DSUShopForms extends DSUForms{
             return;
         }else{
             $player->sendMessage("Selection not recognized.");
+            return;
         }
-        $this->shopMainForm($player);
+    }
+
+    private function getCategoryMenuItems(DSUCategory $parentCategory){
+        $menuItems = [];
+        $categories = $this->manager->getCategoriesByParent($parentCategory->getName());
+        if(is_array($categories)){
+            foreach($categories as $category){
+                $menuItems[] = $category;
+            };
+        }
+
+        $items = $this->manager->getItemsByParent($parentCategory->getName());
+        if(is_array($items)){
+            foreach($items as $item){
+                if($item->canSell()){
+                    $menuItems[] = $item;
+                }
+            }
+        }
+        return $menuItems;
     }
 
     /**
-     * @param Player       $player
-     * @param DSUElement[] $menuItems
+     * @param Player $player
+     * @param array  $menuItems
+     * @param string $msg
+     *
+     * @throws \InvalidArgumentException
      */
-    public function buildMenu(Player $player, $menuItems){
-
+    public function buildMenu(Player $player, array $menuItems, string $msg = ""){
         if(!empty($menuItems)){
             $form = new SimpleForm([$this, "shopFormHandler"]);
             $menuName = $this->shopName . "§2 - " . $this->options[$player->getUniqueId()->toString()][DataKeys::SHOP_DATA_CATEGORIES_KEY];
             $form->setTitle($menuName);
+            if($msg !== ""){
+                $form->setContent($msg);
+            }
             $choices = [];
             foreach($menuItems as $option){
                 if($option instanceof DSUCategory){
@@ -120,7 +116,10 @@ class DSUShopForms extends DSUForms{
                 }elseif($option instanceof DSUItem){
                     array_push($choices, $option);
                     $name = $option->getName() . " " . $option->getSellPrice();
+                } else {
+                    throw new \InvalidArgumentException(__METHOD__ . "requires that argument 2 only contain DSUElement objects, " . get_class($option) . " found");
                 }
+
                 $img = $option->getImage();
                 if($img !== null and $img !== ""){
                     $form->addButton($name, 1, $img);
@@ -134,6 +133,17 @@ class DSUShopForms extends DSUForms{
         }else{
             $player->sendMessage("§r Sorry, that menu can't be created right now.");
             $this->plugin->getLogger()->error("buildMenu called with no Menu Items.");
+        }
+    }
+
+    private function showPreviousMenu(Player $player, $msg = ""){
+        $previous = $this->options[$player->getUniqueId()->toString()]["previous"];
+        if(!($selection = $this->manager->getCategoryByName($previous)) instanceof DSUCategory){
+            $this->shopMainForm($player, $msg);
+            return;
+        } else {
+            $menuItems = $this->getCategoryMenuItems($selection);
+            $this->buildMenu($player, $menuItems, $msg);
         }
     }
 

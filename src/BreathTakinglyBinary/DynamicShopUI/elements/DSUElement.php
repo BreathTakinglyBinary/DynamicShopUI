@@ -3,32 +3,24 @@
 namespace BreathTakinglyBinary\DynamicShopUI\elements;
 
 
-use BreathTakinglyBinary\DynamicShopUI\data\DSUConfig;
-
 abstract class DSUElement{
 
     /** @var string */
     protected $name;
 
-    /** @var DSUCategory[] */
+    /** @var string[] */
     protected $parents = [];
 
     /** @var string */
     protected $image;
-    /**
-     * @var DSUConfig
-     */
-    private $settings;
 
     /**
      * DSUElement constructor.
      *
-     * @param DSUConfig $settings
      * @param string    $name
      * @param string    $image
      */
-    public function __construct(DSUConfig $settings, string $name, string $image = ""){
-        $this->settings = $settings;
+    public function __construct(string $name, string $image = ""){
         $this->name = $name;
         $this->image = $image;
     }
@@ -41,26 +33,7 @@ abstract class DSUElement{
     }
 
     /**
-     * @return DSUConfig
-     */
-    public function getSettings() : DSUConfig{
-        return $this->settings;
-    }
-
-    /**
-     * @param string $parentName
-     *
-     * @return DSUCategory|null
-     */
-    public function getParent(string $parentName) : ?DSUCategory{
-        if($this->isParent($parentName)){
-            return $this->parents[$parentName];
-        }
-        return null;
-    }
-
-    /**
-     * @return DSUCategory[]
+     * @return string[]
      */
     public function getAllParents() : array{
         return $this->parents;
@@ -80,18 +53,17 @@ abstract class DSUElement{
     }
 
     /**
-     * @param DSUCategory $newParent
+     * @param string $newParentName
      *
      * @return bool
      */
-    public function addParent(DSUCategory $newParent) : bool{
+    public function addParent(string $newParentName) : bool{
         // An element can't be it's own parent.
-        if($newParent->getName() === $this->name){
+        if($newParentName === $this->name){
             return false;
         }
-        if(!isset($this->parents[$newParent->getName()])){
-            $this->parents[$newParent->getName()] = $newParent;
-
+        if(!isset($this->parents[$newParentName])){
+            $this->parents[$newParentName] = $newParentName;
             return true;
         }else{
             return false;
@@ -99,18 +71,19 @@ abstract class DSUElement{
     }
 
     /**
-     * @param string $parent
+     * @param string $parentName
+     */
+    public function removeParent(string $parentName) : void{
+        unset($this->parents[$parentName]);
+    }
+
+    /**
+     * @param string $parentName
      *
      * @return bool
      */
-    public function removeParent(string $parent) : bool{
-        if(isset($this->parents[$parent])){
-            unset($this->parents[$parent]);
-
-            return true;
-        }else{
-            return false;
-        }
+    public function hasParent(string $parentName): bool{
+        return isset($this->parents[$parentName]);
     }
 
     /**

@@ -5,7 +5,6 @@ namespace BreathTakinglyBinary\DynamicShopUI\elements;
 
 
 use BreathTakinglyBinary\DynamicShopUI\data\DataKeys;
-use BreathTakinglyBinary\DynamicShopUI\data\DSUConfig;
 use pocketmine\Server;
 
 class DSUCategory extends DSUElement{
@@ -16,12 +15,11 @@ class DSUCategory extends DSUElement{
     /**
      * DSUCategory constructor.
      *
-     * @param DSUConfig $settings
      * @param string    $name
      * @param string    $image
      */
-    public function __construct(DSUConfig $settings, string $name, string $image = ""){
-        parent::__construct($settings, $name, $image);
+    public function __construct(string $name, string $image = ""){
+        parent::__construct($name, $image);
         $this->children[DataKeys::SHOP_DATA_CATEGORIES_KEY] = [];
         $this->children[DataKeys::SHOP_DATA_ITEMS_KEY] = [];
     }
