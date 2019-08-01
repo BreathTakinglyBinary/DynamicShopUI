@@ -3,7 +3,7 @@ name: DynamicShopUI
 main: BreathTakinglyBinary\DynamicShopUI\DynamicShopUI
 api: 3.2.0
 version: 1.0.3
-depend: [FormAPI, EconomyAPI]
+depend: [EconomyAPI]
 author: FiberglassCivic(95CivicSi)
 
 "permissions": {

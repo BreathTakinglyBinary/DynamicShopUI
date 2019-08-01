@@ -20,6 +20,9 @@ class DynamicShopUI extends PluginBase{
     /** @var  DynamicShopUI */
     private static $instance;
 
+    /** @var string */
+    public static $shopName;
+
     /** @var DynamicShopManager */
     private $dynamicShopManager;
 
@@ -41,11 +44,7 @@ class DynamicShopUI extends PluginBase{
     public function onEnable(){
         TextFormat::GOLD;
         self::$instance = $this;
-        if(($this->formAPI = $this->getServer()->getPluginManager()->getPlugin("FormAPI")) === null
-            or $this->formAPI->isDisabled()){
-            $this->getLogger()->warning("FormAPI is not available.  Disabling DynamicShopUI");
-            $this->setEnabled(false);
-        }
+        self::$shopName = $this->getConfig()->get("ShopName", "§l§5Dynamic§fShop");
 
         // Double Checking that EconomyAPI is available.
         if(($this->moneyAPI = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI")) === null
