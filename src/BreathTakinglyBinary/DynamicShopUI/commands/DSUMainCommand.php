@@ -3,6 +3,7 @@
 namespace BreathTakinglyBinary\DynamicShopUI\commands;
 
 use BreathTakinglyBinary\DynamicShopUI\DynamicShopUI;
+use BreathTakinglyBinary\DynamicShopUI\ui\management\ManagementMainForm;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
@@ -28,7 +29,7 @@ class DSUMainCommand extends DSUBaseCommand{
                         $this->sendNoPermission($sender);
                         break;
                     }else{
-                        $this->plugin->getDSUManagementForms()->dsuManageMainForm($sender);
+                        $sender->sendForm(new ManagementMainForm("", $sender->hasPermission("dsu.configuration")));
                         break;
                     }
             }
