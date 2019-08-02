@@ -36,8 +36,9 @@ class DynamicShopUI extends PluginBase{
     private $sellTools;
 
     public function onEnable(){
-        TextFormat::GOLD;
         self::$instance = $this;
+        $this->getServer()->getLoader()->addPath($this->getFile() . "src/DynamicForms/src");
+
         self::$shopName = $this->getConfig()->get("ShopName", "§l§5Dynamic§fShop");
 
         // Double Checking that EconomyAPI is available.
