@@ -16,18 +16,14 @@ class ShopMainForm extends SimpleForm{
     /** @var DSUElement[] */
     private $elements;
 
-    /** @var DynamicShopUI */
-    private $plugin;
-
     public function __construct(string $msg = ""){
         parent::__construct();
-        $this->plugin = DynamicShopUI::getInstance();
         $this->setTitle(DynamicShopUI::$shopName . "§2 - Main");
         $this->setContent($msg);
-        $this->elements = $this->plugin->getDynamicShopManager()->getTopLevelElements();
-        foreach($this->elements as $element){
+        foreach(DynamicShopUI::getInstance()->getDynamicShopManager()->getTopLevelElements() as $element){
             $name = $element->getName();
             $img = $element->getImage();
+            $this->elements[$name] = $element;
             if($img !== null and $img !== ""){
                 $this->addButton($name, $name, 1, $img);
             }else{
@@ -39,7 +35,7 @@ class ShopMainForm extends SimpleForm{
 
     public function onResponse(Player $player, $data) : void{
         if(!isset($this->elements[$data])){
-            MainLogger::getLogger()->error("ShopMainForm->onResponse() called with invalid option" .  $data);
+            MainLogger::getLogger()->error("ShopMainForm->onResponse() called with invalid option " .  $data);
             return;
         }
 
