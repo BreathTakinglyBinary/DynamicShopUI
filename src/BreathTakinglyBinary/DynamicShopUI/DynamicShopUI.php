@@ -32,12 +32,6 @@ class DynamicShopUI extends PluginBase{
     /** @var EconomyAPI */
     private $moneyAPI;
 
-    /** @var DSUManagementForms */
-    private $dsuManagementForms;
-
-    /** @var DSUShopForms */
-    private $dsuShopForms;
-
     /** @var SellTools */
     private $sellTools;
 
@@ -56,9 +50,6 @@ class DynamicShopUI extends PluginBase{
         $this->dynamicShopManager = new DynamicShopManager($this);
 
         $this->dynamicShopManager->loadShopData();
-
-        $this->dsuManagementForms = new DSUManagementForms($this);
-        $this->dsuShopForms = new DSUShopForms($this);
         $this->sellTools = new SellTools($this);
 
         $this->registerCommands();
@@ -90,14 +81,6 @@ class DynamicShopUI extends PluginBase{
 
     public function getEconomyAPI() : EconomyAPI{
         return $this->moneyAPI;
-    }
-
-    public function getDSUManagementForms(){
-        return $this->dsuManagementForms;
-    }
-
-    public function getDSUShopForms(){
-        return $this->dsuShopForms;
     }
 
     public static function sendNoShopMessage(Player $player){
