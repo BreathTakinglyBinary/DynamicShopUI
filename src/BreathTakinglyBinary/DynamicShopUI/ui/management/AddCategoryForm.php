@@ -12,18 +12,22 @@ use pocketmine\Player;
 
 class AddCategoryForm extends CustomForm implements FormKeys{
 
+    /** @var DSUCategory[] */
+    private $availableParents = [];
+
     public function __construct(){
         parent::__construct();
-        $form = new CustomForm([$this, "addCategory"]);
-        $form->setTitle("Add New Category");
-        $form->addInput("Category Name", self::CATEGORY_NAME);
-        $parentNames = [];
+        $this->setTitle("Add New Category");
+        $this->addInput("Category Name", self::CATEGORY_NAME);
+        $parentNames = [""];
         foreach(DynamicShopUI::getInstance()->getDynamicShopManager()->getCategories() as $category){
-            $parentNames[$category->getName()] = $category->getName();
+            $categoryName = $category->getName();
+            $parentNames[] = $categoryName;
+            $this->availableParents[$categoryName] = $category;
         }
 
-        $form->addDropdown("Parent", self::PARENTS, $parentNames);
-        $form->addInput("Image URL", self::IMG_LOCATION);
+        $this->addDropdown("Parent", self::PARENTS, $parentNames);
+        $this->addInput("Image URL", self::IMG_LOCATION);
 
     }
 
@@ -44,8 +48,11 @@ class AddCategoryForm extends CustomForm implements FormKeys{
         }
         $category = new DSUCategory($name, $image);
 
-        if(isset($data[self::PARENTS])){
-            $category->addParent($data[self::PARENTS]);
+        if(isset($data[self::PARENTS]) and $data[self::PARENTS] > 0 and isset($this->availableParents[($data[self::PARENTS] - 1)])){
+            $parent = $this->availableParents[$data[self::PARENTS]];
+            if($parent instanceof DSUCategory){
+                $category->addParent($parent);
+            }
         }
 
         DynamicShopUI::getInstance()->getDynamicShopManager()->addCategory($category);

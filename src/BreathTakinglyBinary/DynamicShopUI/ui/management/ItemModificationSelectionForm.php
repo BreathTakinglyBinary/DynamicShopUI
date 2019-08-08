@@ -13,7 +13,7 @@ use pocketmine\utils\MainLogger;
 
 class ItemModificationSelectionForm extends SimpleForm implements FormKeys{
 
-    /** @var */
+    /** @var bool */
     private $delete;
 
     /** @var DSUItem[] */
@@ -21,6 +21,7 @@ class ItemModificationSelectionForm extends SimpleForm implements FormKeys{
 
     public function __construct(bool $delete = false, string $msg = ""){
         parent::__construct();
+        $this->delete = $delete;
         $this->setTitle("Select Item to " . ($delete ? "Delete" : "Modify"));
         $this->setContent($msg);
         foreach(DynamicShopUI::getInstance()->getDynamicShopManager()->getItems() as $DSUItem){

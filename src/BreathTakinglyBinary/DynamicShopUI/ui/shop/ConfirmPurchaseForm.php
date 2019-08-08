@@ -27,14 +27,15 @@ class ConfirmPurchaseForm extends ModalForm{
         $this->quantity = $quantity;
 
         $this->totalPrice = $priceEach * $quantity;
-        if($quantity > 1){
-            $this->setTitle(DynamicShopUI::$shopName . "§r§f - §2Buy $itemName x $quantity for " . $this->totalPrice);
-            $content = "§eDo you want to buy this?";
-            $content .= "\n§eItem = §b$itemName";
-            $content .= "\n§eQuantity = §b$quantity";
-            $content .= "\n§eTotal Price = §b" . $this->totalPrice;
-            $this->setContent($content);
-        }
+        $this->setTitle("§r§f - §2Buy $itemName x $quantity for " . $this->totalPrice);
+        $content = "§eDo you want to buy this?";
+        $content .= "\n§eItem = §b$itemName";
+        $content .= "\n§eQuantity = §b$quantity";
+        $content .= "\n§eTotal Price = §b" . $this->totalPrice;
+        $this->setContent($content);
+
+        $this->setButton1("Yes");
+        $this->setButton2("No");
     }
 
     public function onResponse(Player $player, $data) : void{

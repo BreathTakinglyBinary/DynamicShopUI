@@ -31,7 +31,7 @@ class ChooseItemQuantityForm extends CustomForm{
         if($data[0] < 1){
             return;
         }
-        $player->sendForm(new ConfirmPurchaseForm($this->transaction, $this->itemName, $this->price, $data[0]));
+        $player->sendForm(new ConfirmPurchaseForm($this->transaction, $this->itemName, $this->price,(int) floor($data[0])));
     }
 
 }

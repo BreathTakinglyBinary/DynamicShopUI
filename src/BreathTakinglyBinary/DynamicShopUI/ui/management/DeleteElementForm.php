@@ -22,7 +22,7 @@ class DeleteElementForm extends ModalForm{
         $this->setTitle("Really delete " . $element->getName() . "?");
         $this->setContent("Are you sure you want to delete " . $element->getName() . " ?");
         $this->setButton1("Yes");
-        $this->setButton1("Cancel");
+        $this->setButton2("Cancel");
     }
 
     public function onResponse(Player $player, $data) : void{
@@ -38,7 +38,14 @@ class DeleteElementForm extends ModalForm{
             $msg = "§a" . $this->element->getName() . " successfully removed.";
 
         }
-        $player->sendForm(new UpdateItemOptionsForm($msg));
+
+        if($this->element instanceof DSUCategory){
+            $form = new UpdateCategoriesOptionsForm($msg);
+        }else{
+            $form = new UpdateItemOptionsForm($msg);
+        }
+
+        $player->sendForm($form);
     }
 
 }
