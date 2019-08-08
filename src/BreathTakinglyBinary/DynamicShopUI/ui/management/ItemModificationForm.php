@@ -44,9 +44,9 @@ class ItemModificationForm extends CustomForm implements FormKeys{
             }
         }
         $this->setTitle("§5§lModify Item - §f$itemName");
-        $this->addToggle("Can Sell", self::CAN_SELL, $DSUItem->canSell());
+        $this->addToggle("Can Sell to Players", self::CAN_SELL, $DSUItem->canSell());
         $this->addInput("Sell Price", self::PRICE_SELL, (string) $sellPrice, (string) $sellPrice);
-        $this->addToggle("Can Buy", self::CAN_BUY, $DSUItem->canBuy());
+        $this->addToggle("Can Buy from Players", self::CAN_BUY, $DSUItem->canBuy());
         $this->addInput("Buy Price", self::PRICE_BUY, (string) $buyPrice, (string) $buyPrice);
         $this->addInput("Image URL", self::IMG_LOCATION, $imageURL, $DSUItem->getImage());
         $this->addDropdown("Remove Parent", self::PARENTS_REMOVE , $parents);
