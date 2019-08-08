@@ -28,18 +28,31 @@ class DynamicShopManager{
 
     public function loadShopData() : void{
         $shopData = yaml_parse_file($this->plugin->getDataFolder() . DataKeys::SHOP_DATA_FILE_NAME);
+        $pendingParents = [];
         if(isset($shopData[DataKeys::SHOP_DATA_CATEGORIES_KEY])){
             foreach($shopData[DataKeys::SHOP_DATA_CATEGORIES_KEY] as $categoryName => $categoryData){
                 $category = new DSUCategory($categoryName);
                 if(isset($categoryData[DataKeys::SHOP_DATA_PARENTS_KEY])){
                     foreach($categoryData[DataKeys::SHOP_DATA_PARENTS_KEY] as $parentName){
-                        $category->addParent($parentName);
+                        if(($parent = $this->getCategoryByName($parentName)) instanceof DSUCategory){
+                            $category->addParent($parent);
+                        }else{
+                            $pendingParents[] = [$category, $parentName];
+                        }
                     }
                 }
                 if(isset($categoryData[DataKeys::SHOP_DATA_IMAGE_KEY])){
                     $category->setImage($categoryData[DataKeys::SHOP_DATA_IMAGE_KEY]);
                 }
                 $this->addCategory($category);
+            }
+        }
+
+        foreach($pendingParents as $data){
+            $pendingElement = $data[0];
+            $missedParent = $this->getCategoryByName($data[1]);
+            if($missedParent instanceof DSUCategory and $pendingElement instanceof DSUElement){
+                $pendingElement->addParent($missedParent);
             }
         }
 
@@ -77,10 +90,13 @@ class DynamicShopManager{
                 }
                 if(isset($itemData[DataKeys::SHOP_DATA_PARENTS_KEY])){
                     foreach($itemData[DataKeys::SHOP_DATA_PARENTS_KEY] as $parentName){
-                        $item->addParent($parentName);
+                        $parent = $this->getCategoryByName($parentName);
+                        if($parent instanceof DSUCategory){
+                            $item->addParent($parent);
+                        }
                     }
                 }
-                $this->items[$itemName] = $item;
+                $this->addItem($item);
             }
         }
     }
@@ -93,6 +109,9 @@ class DynamicShopManager{
             DynamicShopUI::getInstance()->getLogger()->debug("Overwriting Category: " . $category->getName());
         }
         $this->categories[$category->getName()] = $category;
+        foreach($category->getAllParents() as $parentCategory){
+                $parentCategory->addChild($category);
+        }
     }
 
     /**
@@ -100,6 +119,13 @@ class DynamicShopManager{
      */
     public function removeCategory(DSUCategory $category){
         $this->removeCategoryByName($category->getName());
+        foreach($this->categories as $registeredCategory){
+            $registeredCategory->removeChild($category);
+            $registeredCategory->removeParentByName($registeredCategory->getName());
+        }
+        foreach($this->getItems() as $regsiteredItem){
+            $regsiteredItem->removeParentByName($category->getName());
+        }
     }
 
     /**
@@ -107,10 +133,10 @@ class DynamicShopManager{
      */
     public function removeCategoryByName(string $categoryName){
         foreach($this->categories as $localCategory){
-            $localCategory->removeParent($categoryName);
+            $localCategory->removeParentByName($categoryName);
         }
         foreach($this->items as $item){
-            $item->removeParent($categoryName);
+            $item->removeParentByName($categoryName);
         }
         unset($this->categories[$categoryName]);
     }
@@ -141,16 +167,21 @@ class DynamicShopManager{
      * @return DSUElement[]
      */
     public function getTopLevelElements() : array {
+        $this->plugin->getLogger()->info("Getting Top Level Elements");
         $elements = [];
         foreach($this->categories as $category){
+            $this->plugin->getLogger()->debug("Category " . $category->getName() . ", has " . count($category->getAllParents()) . " parents.");
             if(empty($category->getAllParents())){
                 if($this->hasChildren($category, true)){
+                    $this->plugin->getLogger()->debug("Suitable Top Level Element found, " . $category->getName());
                     $elements[] = $category;
                 }
             }
         }
         foreach($this->items as $item){
+            $this->plugin->getLogger()->info("Category " . $item->getName() . ", has " . count($item->getAllParents()) . " parents.");
             if(empty($item->getAllParents()) and $item->canSell()){
+
                 $elements[] = $item;
             }
         }
@@ -165,6 +196,9 @@ class DynamicShopManager{
             DynamicShopUI::getInstance()->getLogger()->debug("Overwriting Item: " . $item->getName());
         }
         $this->items[$item->getName()] = $item;
+        foreach($item->getAllParents() as $parent){
+            $parent->addChild($item);
+        }
     }
 
     /**
@@ -172,6 +206,9 @@ class DynamicShopManager{
      */
     public function removeItem(DSUItem $item) : void{
         unset($this->items[$item->getName()]);
+        foreach($this->getCategories() as $category){
+            $category->removeChild($item);
+        }
     }
 
 
@@ -273,13 +310,26 @@ class DynamicShopManager{
         return false;
     }
 
+    /**
+     * @param DSUElement $element
+     */
+    public function updateElement(DSUElement $element) : void{
+        if($element instanceof DSUCategory){
+            $this->plugin->getLogger()->debug("Updating Category: " . $element->getName());
+            $this->categories[$element->getName()] = $element;
+        }elseif($element instanceof DSUItem){
+            $this->plugin->getLogger()->debug("Updating Item: " . $element->getName());
+            $this->items[$element->getName()] = $element;
+        }
+    }
+
     public function saveShopData() : void{
         $shopData = [];
 
         foreach($this->categories as $category){
             $parents = [];
-            foreach($category->getAllParents() as $parent){
-                array_push($parents, $parent);
+            foreach($category->getAllParents() as $parentName => $parent){
+                array_push($parents, $parentName);
             }
             $shopData[DataKeys::SHOP_DATA_CATEGORIES_KEY][$category->getName()][DataKeys::SHOP_DATA_PARENTS_KEY] = $parents;
             $shopData[DataKeys::SHOP_DATA_CATEGORIES_KEY][$category->getName()][DataKeys::SHOP_DATA_IMAGE_KEY] = $category->getImage();
@@ -298,8 +348,8 @@ class DynamicShopManager{
             $shopData[DataKeys::SHOP_DATA_ITEMS_KEY][$itemName][DataKeys::SHOP_DATA_ITEM_SELL_PRICE_KEY] = $item->getSellPrice();
             $shopData[DataKeys::SHOP_DATA_ITEMS_KEY][$itemName][DataKeys::SHOP_DATA_IMAGE_KEY] = $item->getImage();
             $shopData[DataKeys::SHOP_DATA_ITEMS_KEY][$itemName][DataKeys::SHOP_DATA_PARENTS_KEY] = [];
-            foreach($item->getAllParents() as $parent){
-                $shopData[DataKeys::SHOP_DATA_ITEMS_KEY][$itemName][DataKeys::SHOP_DATA_PARENTS_KEY][] = $parent;
+            foreach($item->getAllParents() as $parentName => $parent){
+                $shopData[DataKeys::SHOP_DATA_ITEMS_KEY][$itemName][DataKeys::SHOP_DATA_PARENTS_KEY][] = $parentName;
             }
         }
 
