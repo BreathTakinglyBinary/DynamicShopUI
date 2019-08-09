@@ -167,7 +167,7 @@ class DynamicShopManager{
      * @return DSUElement[]
      */
     public function getTopLevelElements() : array {
-        $this->plugin->getLogger()->info("Getting Top Level Elements");
+        $this->plugin->getLogger()->debug("Getting Top Level Elements");
         $elements = [];
         foreach($this->categories as $category){
             $this->plugin->getLogger()->debug("Category " . $category->getName() . ", has " . count($category->getAllParents()) . " parents.");
@@ -179,7 +179,7 @@ class DynamicShopManager{
             }
         }
         foreach($this->items as $item){
-            $this->plugin->getLogger()->info("Category " . $item->getName() . ", has " . count($item->getAllParents()) . " parents.");
+            $this->plugin->getLogger()->debug("Category " . $item->getName() . ", has " . count($item->getAllParents()) . " parents.");
             if(empty($item->getAllParents()) and $item->canSell()){
 
                 $elements[] = $item;

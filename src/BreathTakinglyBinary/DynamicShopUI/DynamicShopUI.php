@@ -54,7 +54,7 @@ class DynamicShopUI extends PluginBase{
         $this->sellTools = new SellTools($this);
 
         $this->registerCommands();
-        $this->getLogger()->info(TextFormat::GREEN . "enabled.");
+        $this->getLogger()->debug(TextFormat::GREEN . "enabled.");
     }
 
     public static function getInstance() : DynamicShopUI{
@@ -94,6 +94,6 @@ class DynamicShopUI extends PluginBase{
 
     public function onDisable(){
         $this->dynamicShopManager->saveShopData();
-        $this->getLogger()->info(TextFormat::RED . "disabled.");
+        $this->getLogger()->debug(TextFormat::RED . "disabled.");
     }
 }
