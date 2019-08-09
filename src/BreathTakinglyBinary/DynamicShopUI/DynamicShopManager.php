@@ -86,7 +86,7 @@ class DynamicShopManager{
                     $item->enableSelling(true);
                 }
                 if(isset($itemData[DataKeys::SHOP_DATA_IMAGE_KEY])){
-                    $item->setImage($itemData[DataKeys::SHOP_DATA_IMAGE_KEY]);
+                    $item->setImage(trim($itemData[DataKeys::SHOP_DATA_IMAGE_KEY]));
                 }
                 if(isset($itemData[DataKeys::SHOP_DATA_PARENTS_KEY])){
                     foreach($itemData[DataKeys::SHOP_DATA_PARENTS_KEY] as $parentName){
