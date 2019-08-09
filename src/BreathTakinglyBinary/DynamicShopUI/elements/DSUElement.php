@@ -3,8 +3,6 @@
 namespace BreathTakinglyBinary\DynamicShopUI\elements;
 
 
-use BreathTakinglyBinary\DynamicShopUI\data\DSUConfig;
-
 abstract class DSUElement{
 
     /** @var string */
@@ -15,20 +13,14 @@ abstract class DSUElement{
 
     /** @var string */
     protected $image;
-    /**
-     * @var DSUConfig
-     */
-    private $settings;
 
     /**
      * DSUElement constructor.
      *
-     * @param DSUConfig $settings
      * @param string    $name
      * @param string    $image
      */
-    public function __construct(DSUConfig $settings, string $name, string $image = ""){
-        $this->settings = $settings;
+    public function __construct(string $name, string $image = ""){
         $this->name = $name;
         $this->image = $image;
     }
@@ -38,25 +30,6 @@ abstract class DSUElement{
      */
     public function getName() : string{
         return $this->name;
-    }
-
-    /**
-     * @return DSUConfig
-     */
-    public function getSettings() : DSUConfig{
-        return $this->settings;
-    }
-
-    /**
-     * @param string $parentName
-     *
-     * @return DSUCategory|null
-     */
-    public function getParent(string $parentName) : ?DSUCategory{
-        if($this->isParent($parentName)){
-            return $this->parents[$parentName];
-        }
-        return null;
     }
 
     /**
@@ -79,38 +52,39 @@ abstract class DSUElement{
         return false;
     }
 
-    /**
-     * @param DSUCategory $newParent
-     *
-     * @return bool
-     */
-    public function addParent(DSUCategory $newParent) : bool{
-        // An element can't be it's own parent.
-        if($newParent->getName() === $this->name){
-            return false;
-        }
-        if(!isset($this->parents[$newParent->getName()])){
-            $this->parents[$newParent->getName()] = $newParent;
 
-            return true;
-        }else{
-            return false;
+    /**
+     * @param DSUCategory $category
+     */
+    public function addParent(DSUCategory $category) : void{
+        if($category->getName() === $this->name){
+            return;
         }
+        $this->parents[$category->getName()] = $category;
+        $category->addChild($this);
     }
 
     /**
-     * @param string $parent
+     * @param DSUCategory $category
+     */
+    public function removeParent(DSUCategory $category) : void{
+        $this->removeParentByName($category->getName());
+    }
+
+    /**
+     * @param string $parentName
+     */
+    public function removeParentByName(string $parentName) : void{
+        unset($this->parents[$parentName]);
+    }
+
+    /**
+     * @param string $parentName
      *
      * @return bool
      */
-    public function removeParent(string $parent) : bool{
-        if(isset($this->parents[$parent])){
-            unset($this->parents[$parent]);
-
-            return true;
-        }else{
-            return false;
-        }
+    public function hasParent(string $parentName): bool{
+        return isset($this->parents[$parentName]);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace BreathTakinglyBinary\DynamicShopUI\commands;
 
 use BreathTakinglyBinary\DynamicShopUI\DynamicShopUI;
+use BreathTakinglyBinary\DynamicShopUI\ui\shop\ShopMainForm;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
@@ -29,7 +30,7 @@ class DSUShopCommand extends DSUBaseCommand{
             return;
         }
 
-        $this->plugin->getDSUShopForms()->shopMainForm($sender);
+        $sender->sendForm(new ShopMainForm());
     }
 
 }

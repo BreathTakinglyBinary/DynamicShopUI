@@ -11,35 +11,53 @@ class DSUSellCommand extends DSUBaseCommand{
     public function __construct(DynamicShopUI $plugin){
         $name = "sell";
         $description = "Allows you to sell items from your inventory.";
-        $usageMessage = "/sell <all | hand> Defaults to all";
-        $this->setPermission("dsu.command.sell");
+        $usageMessage = "/sell <all | hand> Defaults to /sell hand";
         parent::__construct($plugin, $name, $description, $usageMessage);
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args){
         if(!$sender instanceof Player){
             $this->sendConsoleError($sender);
-
             return;
         }
 
-        if(!$this->testPermission($sender)){
-            $this->sendNoPermission($sender);
-
-            return;
-        }
         if(isset($args[0])){
             switch(strtolower($args[0])){
-                case "hand":
-                    $this->plugin->getSellTools()->sellHand($sender);
+                case "all":
+                    $this->sellAll($sender);
                     break;
-
                 default:
-                    $sender->sendMessage($this->getUsage());
-                    break;
+                    $this->sellHand($sender);
             }
         }else{
-            $this->plugin->getSellTools()->sellAll($sender);
+            $this->sellHand($sender);
         }
+        return;
+    }
+
+    /**
+     * @param Player $player
+     *
+     * @throws \InvalidStateException
+     */
+    private function sellAll(Player $player){
+        if(!$player->hasPermission("dsu.command.sell.all")){
+            $this->sendNoPermission($player);
+            return;
+        }
+        $this->plugin->getSellTools()->sellAll($player);
+    }
+
+    /**
+     * @param Player $player
+     *
+     * @throws \InvalidStateException
+     */
+    private function sellHand(Player $player){
+        if(!$player->hasPermission("dsu.command.sell.hand")){
+            $this->sendNoPermission($player);
+            return;
+        }
+        $this->plugin->getSellTools()->sellHand($player);
     }
 }

@@ -2,13 +2,13 @@
 name: DynamicShopUI
 main: BreathTakinglyBinary\DynamicShopUI\DynamicShopUI
 api: 3.2.0
-version: 0.2.0
-depend: [FormAPI, EconomyAPI]
+version: 1.0.3
+depend: [EconomyAPI]
 author: FiberglassCivic(95CivicSi)
 
 "permissions": {
         "dsu": {
-            "default": false,
+            "default": "op",
             "description": "Allows access to all DynamicShopUI features.",
             "children": {
                 "dsu.configuration": {
@@ -16,7 +16,7 @@ author: FiberglassCivic(95CivicSi)
                     "description": "Allows modifying the configuration in-game."
                 },
                 "dsu.command": {
-                    "default": false,
+                    "default": "op",
                     "description": "Allows access to all DSU command features.",
                     "children": {
                         "dsu.command.manage": {
@@ -24,8 +24,18 @@ author: FiberglassCivic(95CivicSi)
                             "description": "Allows user to manage buy/sell options for the shop."
                         },
                         "dsu.command.sell": {
-                            "default": true,
-                            "description": "Allows the sell of items in user's inventory, to the shop."
+                            "default": "op",
+                            "description": "Allows the use of all sell options.",
+                            "children": {
+                                "dsu.command.sell.all": {
+                                    "default": "op",
+                                    "description": "Allows players to use the sell all command."
+                                },
+                                "dsu.command.sell.hand": {
+                                    "default": true,
+                                    "description": "Allows players to use the sell all command."
+                                }
+                            }
                         },
                         "dsu.command.shop": {
                             "default": true,

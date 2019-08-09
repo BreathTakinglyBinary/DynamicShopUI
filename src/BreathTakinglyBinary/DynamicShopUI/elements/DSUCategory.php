@@ -5,7 +5,6 @@ namespace BreathTakinglyBinary\DynamicShopUI\elements;
 
 
 use BreathTakinglyBinary\DynamicShopUI\data\DataKeys;
-use BreathTakinglyBinary\DynamicShopUI\data\DSUConfig;
 use pocketmine\Server;
 
 class DSUCategory extends DSUElement{
@@ -16,74 +15,44 @@ class DSUCategory extends DSUElement{
     /**
      * DSUCategory constructor.
      *
-     * @param DSUConfig $settings
      * @param string    $name
      * @param string    $image
      */
-    public function __construct(DSUConfig $settings, string $name, string $image = ""){
-        parent::__construct($settings, $name, $image);
+    public function __construct(string $name, string $image = ""){
+        parent::__construct($name, $image);
         $this->children[DataKeys::SHOP_DATA_CATEGORIES_KEY] = [];
         $this->children[DataKeys::SHOP_DATA_ITEMS_KEY] = [];
     }
 
     /**
      * @param DSUElement $newChild
-     *
-     * @return bool
      */
-    public function addChild(DSUElement &$newChild) : bool{
+    public function addChild(DSUElement &$newChild) : void{
         $selfName = $this->name;
         $childName = $newChild->getName();
-        Server::getInstance()->getLogger()->info("$selfName adding child $childName");
         if($newChild->getName() === $this->getName()){
             // Categories cannot have children of themselves.
-            return false;
+            return;
         }
-        if($newChild instanceof DSUCategory){
-            if(!isset($this->children[DataKeys::SHOP_DATA_CATEGORIES_KEY][$newChild->getName()])){
-                $this->children[DataKeys::SHOP_DATA_CATEGORIES_KEY][$newChild->getName()] = $newChild;
-
-                return true;
-            }
-
-            return false;
-        }elseif($newChild instanceof DSUItem){
-            if(!isset($this->children[DataKeys::SHOP_DATA_ITEMS_KEY][$newChild->getName()])){
-                $this->children[DataKeys::SHOP_DATA_ITEMS_KEY][$newChild->getName()] = $newChild;
-
-                return true;
-            }else{
-                return false;
-            }
+        Server::getInstance()->getLogger()->debug("$selfName adding child $childName");
+        if($newChild instanceof DSUCategory and !isset($this->children[DataKeys::SHOP_DATA_CATEGORIES_KEY][$newChild->getName()])){
+            $this->children[DataKeys::SHOP_DATA_CATEGORIES_KEY][$newChild->getName()] = $newChild;
+        }elseif($newChild instanceof DSUItem and !isset($this->children[DataKeys::SHOP_DATA_ITEMS_KEY][$newChild->getName()])){
+            $this->children[DataKeys::SHOP_DATA_ITEMS_KEY][$newChild->getName()] = $newChild;
         }else{
-            return false;
+            return;
         }
+        $newChild->addParent($this);
     }
 
     /**
      * @param DSUElement $child
-     *
-     * @return bool
      */
-    public function removeChild(DSUElement &$child) : bool{
+    public function removeChild(DSUElement &$child) : void{
         if($child instanceof DSUCategory){
-            if(isset($this->children[DataKeys::SHOP_DATA_CATEGORIES_KEY][$child->getName()])){
-                unset($this->children[DataKeys::SHOP_DATA_CATEGORIES_KEY][$child->getName()]);
-
-                return true;
-            }
-
-            return false;
+            unset($this->children[DataKeys::SHOP_DATA_CATEGORIES_KEY][$child->getName()]);
         }elseif($child instanceof DSUItem){
-            if(!isset($this->children[DataKeys::SHOP_DATA_ITEMS_KEY][$child->getName()])){
-                $this->children[DataKeys::SHOP_DATA_ITEMS_KEY][$child->getName()] = $child;
-
-                return true;
-            }else{
-                return false;
-            }
-        }else{
-            return false;
+            unset($this->children[DataKeys::SHOP_DATA_ITEMS_KEY][$child->getName()]);
         }
     }
 
