@@ -49,8 +49,8 @@ class AddItemForm extends CustomForm implements FormKeys{
 
         $itemId = (int) $data[self::ITEM_ID];
         $itemMeta = 0;
-        if(is_numeric($data[self::ITEM_META]) and $data[self::ITEM_ID] > 0){
-            $itemMeta = (int) $data[self::ITEM_ID];
+        if(is_numeric($data[self::ITEM_META]) and $data[self::ITEM_META] > 0){
+            $itemMeta = (int) $data[self::ITEM_META];
         }
         $item = Item::get($itemId, $itemMeta);
         if((DynamicShopUI::getInstance()->getDynamicShopManager()->getItemById($itemId, $itemMeta)) instanceof DSUItem){
