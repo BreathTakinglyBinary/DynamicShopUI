@@ -32,6 +32,7 @@ class UpdateCategoriesOptionsForm extends SimpleForm implements FormKeys{
                 break;
             case self::CATEGORY_REMOVE:
                 $player->sendForm(new CategoryModificationSelectionForm(true));
+                break;
             case self::BACK:
                 $player->sendForm(new ManagementMainForm("", $player->hasPermission("dsu.configuration")));
                 break;

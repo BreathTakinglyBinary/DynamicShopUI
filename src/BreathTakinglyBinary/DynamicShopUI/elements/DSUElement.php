@@ -8,7 +8,7 @@ abstract class DSUElement{
     /** @var string */
     protected $name;
 
-    /** @var string[] */
+    /** @var DSUCategory[] */
     protected $parents = [];
 
     /** @var string */
@@ -33,7 +33,7 @@ abstract class DSUElement{
     }
 
     /**
-     * @return string[]
+     * @return DSUCategory[]
      */
     public function getAllParents() : array{
         return $this->parents;
@@ -52,28 +52,29 @@ abstract class DSUElement{
         return false;
     }
 
+
     /**
-     * @param string $newParentName
-     *
-     * @return bool
+     * @param DSUCategory $category
      */
-    public function addParent(string $newParentName) : bool{
-        // An element can't be it's own parent.
-        if($newParentName === $this->name){
-            return false;
+    public function addParent(DSUCategory $category) : void{
+        if($category->getName() === $this->name){
+            return;
         }
-        if(!isset($this->parents[$newParentName])){
-            $this->parents[$newParentName] = $newParentName;
-            return true;
-        }else{
-            return false;
-        }
+        $this->parents[$category->getName()] = $category;
+        $category->addChild($this);
+    }
+
+    /**
+     * @param DSUCategory $category
+     */
+    public function removeParent(DSUCategory $category) : void{
+        $this->removeParentByName($category->getName());
     }
 
     /**
      * @param string $parentName
      */
-    public function removeParent(string $parentName) : void{
+    public function removeParentByName(string $parentName) : void{
         unset($this->parents[$parentName]);
     }
 

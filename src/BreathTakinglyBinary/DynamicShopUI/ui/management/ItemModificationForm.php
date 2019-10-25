@@ -5,6 +5,7 @@ namespace BreathTakinglyBinary\DynamicShopUI\ui\management;
 
 
 use BreathTakinglyBinary\DynamicShopUI\DynamicShopUI;
+use BreathTakinglyBinary\DynamicShopUI\elements\DSUCategory;
 use BreathTakinglyBinary\DynamicShopUI\elements\DSUItem;
 use BreathTakinglyBinary\DynamicShopUI\ui\FormKeys;
 use BreathTakinglyBinary\libDynamicForms\CustomForm;
@@ -13,32 +14,41 @@ use pocketmine\Player;
 class ItemModificationForm extends CustomForm implements FormKeys{
 
     /** @var DSUItem */
-    private $DSUItem;
+    private $item;
+
+    /** @var DSUCategory[] */
+    private $availableCategories = [];
+
+    /** @var string[] */
+    private $parents = [];
 
     public function __construct(DSUItem $DSUItem){
         parent::__construct();
-        $this->DSUItem = $DSUItem;
+        $this->item = $DSUItem;
 
         $itemName = $DSUItem->getName();
         $sellPrice = $DSUItem->getSellPrice();
         $buyPrice = $DSUItem->getBuyPrice();
         $imageURL = $DSUItem->getImage();
         $parents = [""];
-        foreach($DSUItem->getAllParents() as $parent => $data){
-            array_push($parents, $parent);
+        $this->parents[] = null;
+        foreach($DSUItem->getAllParents() as $parentName => $category){
+            $parents[] = $parentName;
+            $this->parents[] = $parentName;
         }
-        $categories = [];
-        foreach(DynamicShopUI::getInstance()->getDynamicShopManager()->getCategories() as $category => $data){
-            if(!in_array($category, $parents)){
-                $categories[] = $category;
+        $categories = [""];
+        foreach(DynamicShopUI::getInstance()->getDynamicShopManager()->getCategories() as $categoryName => $category){
+            if(!in_array($categoryName, $parents)){
+                $categories[] = $categoryName;
+                $this->availableCategories[] = $category;
             }
         }
         $this->setTitle("§5§lModify Item - §f$itemName");
-        $this->addToggle("Can Sell", self::CAN_SELL, $DSUItem->canSell());
-        $this->addInput("Sell Price", self::PRICE_SELL, (string) $sellPrice);
-        $this->addToggle("Can Buy", self::CAN_BUY, $DSUItem->canBuy());
-        $this->addInput("Buy Price", self::PRICE_BUY, (string) $buyPrice);
-        $this->addInput("Image URL", self::IMG_LOCATION, $imageURL);
+        $this->addToggle("Can Sell to Players", self::CAN_SELL, $DSUItem->canSell());
+        $this->addInput("Sell Price", self::PRICE_SELL, (string) $sellPrice, (string) $sellPrice);
+        $this->addToggle("Can Buy from Players", self::CAN_BUY, $DSUItem->canBuy());
+        $this->addInput("Buy Price", self::PRICE_BUY, (string) $buyPrice, (string) $buyPrice);
+        $this->addInput("Image URL", self::IMG_LOCATION, $imageURL, $DSUItem->getImage());
         $this->addDropdown("Remove Parent", self::PARENTS_REMOVE , $parents);
         $this->addDropdown("Add Parent", self::PARENTS_ADD, $categories);
         
@@ -47,38 +57,43 @@ class ItemModificationForm extends CustomForm implements FormKeys{
     public function onResponse(Player $player, $data) : void{
         $changes = false;
         $msg = "";
-        if(isset($data[self::CAN_SELL])){
-            $this->DSUItem->enableSelling((bool) $data[self::CAN_SELL]);
+        if(isset($data[self::CAN_SELL]) and $data[self::CAN_SELL] !== $this->item->canSell()){
+            $this->item->enableSelling((bool) $data[self::CAN_SELL]);
             $changes = true;
         }
-        if(isset($data[self::PRICE_SELL])){
-            $this->DSUItem->setSellPrice($data[self::PRICE_SELL]);
+        if(isset($data[self::PRICE_SELL]) and $data[self::PRICE_SELL] !== $this->item->getSellPrice()){
+            $this->item->setSellPrice((float) $data[self::PRICE_SELL]);
             $changes = true;
         }
-        if(isset($data[self::CAN_BUY])){
-            $this->DSUItem->enableBuying($data[self::CAN_BUY]);
+        if(isset($data[self::CAN_BUY]) and $data[self::CAN_BUY] !== $this->item->canBuy()){
+            $this->item->enableBuying((bool) $data[self::CAN_BUY]);
             $changes = true;
         }
-        if(isset($data[self::PRICE_BUY])){
-            $this->DSUItem->setBuyPrice($data[self::PRICE_BUY]);
+        if(isset($data[self::PRICE_BUY]) and $data[self::PRICE_BUY] !== $this->item->getBuyPrice()){
+            $this->item->setBuyPrice((float) $data[self::PRICE_BUY]);
             $changes = true;
         }
-        if(isset($data[self::IMG_LOCATION])){
-            $this->DSUItem->setImage($data[self::IMG_LOCATION]);
+        if(isset($data[self::IMG_LOCATION]) and $data[self::IMG_LOCATION] !== $this->item->getImage()){
+            $this->item->setImage($data[self::IMG_LOCATION]);
             $changes = true;
         }
-        if(isset($data[self::PARENTS_REMOVE])){
-            $this->DSUItem->removeParent($data[self::PARENTS_REMOVE]);
+        if(isset($data[self::PARENTS_REMOVE]) and $data[self::PARENTS_REMOVE] > 0){
+            $this->item->removeParentByName((string) $data[self::PARENTS_REMOVE]);
             $changes = true;
         }
         if(isset($data[self::PARENTS_ADD])){
-            $this->DSUItem->addParent($data[self::PARENTS_ADD]);
-            $changes = true;
+            $index = $data[self::PARENTS_ADD] - 1;
+            if($index > 0 and isset($this->availableCategories[$index])){
+                $this->item->addParent($this->availableCategories[$index]);
+                $changes = true;
+            }
         }
 
         if($changes){
+            DynamicShopUI::getInstance()->getDynamicShopManager()->updateElement($this->item);
             $msg = "§aItem Updated Successfully!";
         }
+
         $player->sendForm(new UpdateItemOptionsForm($msg));
     }
 }

@@ -22,8 +22,10 @@ interface FormKeys{
 
     const ITEM = "ITEM";
     const ITEM_DAMAGE = "item_id";
-    const ITEM_ID = "item_id";
+    const ITEM_ID = "item_meta";
     const ITEM_META = self::ITEM_DAMAGE;
+
+    const MAIN = "main";
 
     const PARENTS = "parents";
     const PARENTS_ADD = "add_parent";
