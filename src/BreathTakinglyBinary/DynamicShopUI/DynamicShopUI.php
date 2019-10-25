@@ -31,7 +31,9 @@ class DynamicShopUI extends PluginBase{
 
     public function onEnable(){
         self::$instance = $this;
-        $this->getServer()->getLoader()->addPath($this->getFile() . "src/DynamicForms/src");
+        if(!class_exists("\BreathTakinglyBinary\libDynamicForms\Form")){
+            $this->getServer()->getLoader()->addPath($this->getFile() . "src/DynamicForms/src");
+        }
 
         self::$shopName = $this->getConfig()->get("ShopName", "§l§5Dynamic§fShop");
 
