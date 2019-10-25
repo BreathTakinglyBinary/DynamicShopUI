@@ -5,10 +5,7 @@ namespace BreathTakinglyBinary\DynamicShopUI;
 use BreathTakinglyBinary\DynamicShopUI\commands\DSUMainCommand;
 use BreathTakinglyBinary\DynamicShopUI\commands\DSUSellCommand;
 use BreathTakinglyBinary\DynamicShopUI\commands\DSUShopCommand;
-use BreathTakinglyBinary\DynamicShopUI\ui\DSUManagementForms;
-use BreathTakinglyBinary\DynamicShopUI\ui\DSUShopForms;
 use BreathTakinglyBinary\DynamicShopUI\utils\SellTools;
-use jojoe77777\FormAPI\FormAPI;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
@@ -25,9 +22,6 @@ class DynamicShopUI extends PluginBase{
 
     /** @var DynamicShopManager */
     private $dynamicShopManager;
-
-    /** @var FormAPI */
-    private $formAPI;
 
     /** @var EconomyAPI */
     private $moneyAPI;
@@ -74,10 +68,6 @@ class DynamicShopUI extends PluginBase{
      */
     public function getDynamicShopManager() : DynamicShopManager{
         return $this->dynamicShopManager;
-    }
-
-    public function getFormAPI() : FormAPI{
-        return $this->formAPI;
     }
 
     public function getEconomyAPI() : EconomyAPI{
