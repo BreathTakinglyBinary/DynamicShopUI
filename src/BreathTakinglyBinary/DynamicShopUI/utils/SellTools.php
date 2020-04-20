@@ -49,7 +49,12 @@ class SellTools{
     }
 
     public function sellHand(Player $player){
-        $this->sellItem($player, $player->getInventory()->getHeldItemIndex());
+        $heldItem = $player->getInventory()->getItemInHand();
+        foreach($player->getInventory()->getContents() as $index => $item){
+            if($heldItem->getId() === $item->getId() && $heldItem->getDamage() === $item->getDamage()){
+                $this->sellItem($player, $index);
+            }
+        }
     }
 
     public function sellAll(Player $player){

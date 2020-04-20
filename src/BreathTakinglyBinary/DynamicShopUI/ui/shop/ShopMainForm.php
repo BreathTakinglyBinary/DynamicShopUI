@@ -10,7 +10,6 @@ use BreathTakinglyBinary\DynamicShopUI\elements\DSUElement;
 use BreathTakinglyBinary\DynamicShopUI\elements\DSUItem;
 use BreathTakinglyBinary\DynamicShopUI\utils\DynamicShopTransaction;
 use BreathTakinglyBinary\libDynamicForms\SimpleForm;
-use pocketmine\item\Item;
 use pocketmine\Player;
 use pocketmine\utils\MainLogger;
 
@@ -56,6 +55,6 @@ class ShopMainForm extends SimpleForm{
         }elseif($element instanceof DSUItem){
             (new DynamicShopTransaction($player, $element))->startTransaction();
         }
-    }
 
+    }
 }
